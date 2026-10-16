@@ -1,0 +1,2402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#ffffff">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Shine Guild">
+<title>Shine — Guild of Trust</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* ---- Color tokens ---- */
+  --canvas:#F7F2E7;
+  --canvas-deep:#F0E9D8;
+  --surface:#FFFFFF;
+  --surface-soft:#FBF8F0;
+  --ink:#221C34;
+  --ink-soft:#615C78;
+  --ink-faint:#9791A8;
+  --line:rgba(34,28,52,.11);
+  --line-strong:rgba(34,28,52,.20);
+
+  --gold:#AD7A22;
+  --gold-deep:#7E5714;
+  --gold-bright:#E7B94D;
+  --gold-wash:#FBEFD9;
+
+  --violet:#5B4B9E;
+  --violet-deep:#40336E;
+  --violet-wash:#ECE7FB;
+
+  --sage:#2C8C66;
+  --sage-deep:#1F6B4C;
+  --sage-wash:#E1F3EA;
+
+  --coral:#BE4D38;
+  --coral-deep:#96392A;
+  --coral-wash:#FCEAE4;
+
+  --rose:#B24E78;
+  --rose-wash:#FBE6EF;
+
+  --shadow-card:0 14px 34px -22px rgba(34,28,52,.38);
+  --shadow-pop:0 24px 60px -24px rgba(34,28,52,.45);
+  --shadow-gold:0 10px 26px -12px rgba(173,122,34,.45);
+
+  --r-lg:22px;
+  --r-md:16px;
+  --r-sm:11px;
+
+  /* ---- Back-compat aliases (older inline styles in this file still
+     reference these names — keep them pointed at the new tokens so
+     nothing silently falls back to unstyled/inherited values) ---- */
+  --text:var(--ink);
+  --text-dim:var(--ink-soft);
+  --text-faint:var(--ink-faint);
+  --ink-raised:var(--surface-soft);
+  --ink-line:var(--line);
+  --gold-soft:var(--gold-bright);
+}
+
+/* ================= RESET ================= */
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;}
+body{
+  font-family:'Manrope',sans-serif;
+  color:var(--ink);
+  background:
+    radial-gradient(60% 40% at 12% 0%, rgba(91,75,158,.08), transparent 60%),
+    radial-gradient(55% 40% at 100% 8%, rgba(173,122,34,.10), transparent 60%),
+    radial-gradient(70% 55% at 50% 100%, rgba(44,140,102,.06), transparent 60%),
+    var(--canvas);
+  min-height:100vh;width:100%;height:100%;
+  overflow:hidden;overscroll-behavior:none;
+  -webkit-user-select:none;user-select:none;
+}
+input,textarea{user-select:text;-webkit-user-select:text;}
+button{font:inherit;}
+::selection{background:rgba(173,122,34,.25);}
+
+#stars{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.5;
+  background-image:radial-gradient(1.5px 1.5px at 10% 20%, rgba(91,75,158,.35) 100%, transparent),
+    radial-gradient(1.5px 1.5px at 82% 14%, rgba(173,122,34,.35) 100%, transparent),
+    radial-gradient(1.5px 1.5px at 62% 78%, rgba(44,140,102,.3) 100%, transparent),
+    radial-gradient(1.5px 1.5px at 30% 64%, rgba(91,75,158,.28) 100%, transparent),
+    radial-gradient(1.5px 1.5px at 92% 86%, rgba(173,122,34,.28) 100%, transparent);
+}
+
+/* ================= APP SHELL ================= */
+.app{position:relative;z-index:1;max-width:480px;width:100%;height:100dvh;min-height:100dvh;margin:0 auto;
+  background:var(--surface);display:flex;flex-direction:column;overflow:hidden;
+  box-shadow:0 0 0 1px var(--line);}
+
+.topbar{flex-shrink:0;z-index:90;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;
+  padding:14px 18px 10px;background:rgba(255,255,255,.9);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line);position:relative;}
+.brand{display:flex;align-items:center;gap:10px;}
+.brand-mark{width:42px;height:42px;border-radius:13px;flex:0 0 42px;display:flex;align-items:center;justify-content:center;font-size:21px;
+  background:conic-gradient(from 220deg,var(--gold-bright),var(--rose),var(--violet),var(--gold-bright));
+  box-shadow:0 0 0 1px rgba(173,122,34,.25),0 8px 20px -8px rgba(173,122,34,.5);}
+.brand-name{font-family:'Cinzel',serif;font-weight:700;font-size:19px;letter-spacing:1px;color:var(--gold-deep);}
+.brand-tag{font-size:9.5px;color:var(--ink-faint);letter-spacing:1.6px;margin-top:-1px;font-weight:700;}
+.top-tagline{display:none;font-family:'Cinzel',serif;font-size:16px;color:var(--violet-deep);white-space:nowrap;}
+
+.role-pill{display:flex;flex-basis:100%;justify-content:center;background:var(--surface-soft);border:1px solid var(--line);border-radius:999px;padding:3px;font-size:12px;font-weight:700;}
+.role-pill button{border:none;background:transparent;color:var(--ink-soft);padding:6px 13px;border-radius:999px;cursor:pointer;font-family:'Manrope';font-weight:700;font-size:12px;transition:.2s;}
+.role-pill button.active{background:linear-gradient(135deg,var(--gold-bright),var(--gold));color:#3A2606;box-shadow:0 4px 12px rgba(173,122,34,.35);}
+
+.top-actions{display:flex;align-items:center;gap:8px;margin-left:auto;}
+.top-icon{position:relative;border:1px solid var(--line);background:var(--surface);color:var(--violet-deep);
+  font-size:17px;width:38px;height:38px;border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.top-icon i{position:absolute;right:-4px;top:-4px;background:var(--coral);color:#fff;font:800 8.5px 'Manrope';border-radius:9px;padding:2.5px 5px;font-style:normal;box-shadow:0 0 0 2px #fff;}
+.profile-pill{display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--surface);
+  padding:5px 12px 5px 5px;border-radius:999px;cursor:pointer;min-width:0;}
+.profile-avatar{width:32px;height:32px;border-radius:50%;flex:0 0 32px;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,var(--violet),var(--rose));color:#fff;font-weight:800;font-size:13px;}
+.profile-pill b{display:block;font-size:11.5px;color:var(--ink);white-space:nowrap;}
+.profile-pill small{display:block;color:var(--sage);font-size:9px;margin-top:1px;}
+.profile-pill>span{color:var(--ink-faint);font-size:10px;}
+
+.guild-status{margin:0 18px 6px;padding:8px 12px;border:1px solid var(--line);border-radius:12px;
+  background:var(--surface-soft);display:flex;gap:8px;align-items:center;font-size:10px;color:var(--ink-soft);
+  letter-spacing:.2px;flex-shrink:0;}
+.guild-status b{color:var(--sage-deep);font-size:9.5px;font-weight:800;}
+.status-live{margin-left:auto;color:var(--sage);font-weight:800;font-size:8.5px;display:flex;align-items:center;gap:4px;}
+.status-live::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--sage);animation:livePulse 1.6s infinite;}
+@keyframes livePulse{50%{opacity:.3;}}
+
+/* ================= SCREENS ================= */
+.screen{display:none;flex:1;flex-direction:column;padding:4px 18px 100px;min-height:0;overflow-y:auto;overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;overscroll-behavior:contain;scrollbar-width:none;position:relative;z-index:2;}
+.screen::-webkit-scrollbar{display:none;}
+.screen.active{display:flex;animation:rise .3s ease;}
+/* A scrollable flex column must not let the browser shrink its children to
+   force a fit — that's what caused the guild card (and would cause any
+   tall-ish child) to get crushed down to a sliver on content-heavy screens
+   like Profile, while short screens looked fine. Children should keep
+   their natural size and let the screen scroll instead. */
+.screen > *{flex-shrink:0;}
+@keyframes rise{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+
+.backbtn{background:none;border:none;color:var(--ink-soft);font-size:13px;font-weight:700;display:flex;align-items:center;gap:4px;cursor:pointer;margin:12px 0 6px;padding:4px 0;}
+.backbtn:hover{color:var(--ink);}
+.center-note{text-align:center;color:var(--ink-faint);font-size:11.5px;margin-top:8px;line-height:1.5;}
+a.linklike{color:var(--gold-deep);text-decoration:underline;cursor:pointer;}
+.hide{display:none !important;}
+
+/* ================= BUTTONS ================= */
+.btn{border:none;cursor:pointer;font-family:'Manrope';font-weight:800;letter-spacing:.2px;border-radius:14px;
+  padding:14px 20px;font-size:14.5px;min-height:48px;display:flex;align-items:center;justify-content:center;gap:8px;
+  transition:transform .15s ease,box-shadow .15s ease;position:relative;z-index:3;}
+.btn:active{transform:scale(.97);}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none;}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2.5px solid rgba(91,75,158,.45);outline-offset:2px;}
+.btn-gold{background:linear-gradient(135deg,var(--gold-bright),var(--gold));color:#3A2606;box-shadow:var(--shadow-gold);width:100%;}
+.btn-ghost{background:var(--surface);color:var(--ink);border:1px solid var(--line-strong);width:100%;}
+.btn-coral{background:linear-gradient(135deg,#DE7359,var(--coral));color:#fff;box-shadow:0 10px 24px -10px rgba(190,77,56,.55);}
+.btn-sage{background:linear-gradient(135deg,#4CB68A,var(--sage-deep));color:#fff;box-shadow:0 10px 24px -10px rgba(44,140,102,.5);}
+.btn-sm{padding:10px 14px;font-size:13px;min-height:38px;border-radius:11px;}
+.login-actions{width:100%;display:flex;flex-direction:column;gap:10px;margin-top:6px;}
+
+/* ================= FORM FIELDS ================= */
+.field{margin-bottom:14px;}
+.field label{font-size:12px;color:var(--ink-soft);font-weight:700;display:block;margin-bottom:6px;letter-spacing:.2px;}
+.field input,.field textarea,.field select{width:100%;background:var(--surface-soft);border:1px solid var(--line-strong);
+  border-radius:12px;padding:12px 13px;color:var(--ink);font-family:'Manrope';font-size:14px;}
+.field input::placeholder,.field textarea::placeholder{color:var(--ink-faint);}
+.field textarea{resize:vertical;min-height:74px;}
+.icon-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+.icon-pick{aspect-ratio:1;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:4px;background:var(--surface-soft);border:1.5px solid var(--line-strong);cursor:pointer;font-size:22px;}
+.icon-pick span.lbl{font-size:9px;color:var(--ink-faint);font-weight:700;}
+.icon-pick.sel{border-color:var(--gold);background:var(--gold-wash);box-shadow:0 0 0 3px rgba(173,122,34,.14);}
+.stepper{display:flex;align-items:center;gap:14px;background:var(--surface-soft);border:1px solid var(--line-strong);
+  border-radius:12px;padding:10px 14px;justify-content:space-between;}
+.stepper button{width:32px;height:32px;border-radius:9px;border:none;background:var(--surface);color:var(--gold-deep);
+  font-size:18px;font-weight:800;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.06);}
+
+/* ================= LOGIN / SPLASH ================= */
+#screen-login{align-items:center;justify-content:center;text-align:center;padding-top:30px;gap:20px;}
+.seal-hero{width:132px;height:132px;border-radius:50%;position:relative;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(circle at 35% 28%,var(--gold-wash),var(--surface) 70%);
+  box-shadow:0 0 0 1px rgba(173,122,34,.22),0 20px 50px -18px rgba(91,75,158,.35);flex-shrink:0;}
+.seal-hero::before{content:"";position:absolute;inset:-10px;border-radius:50%;border:1.5px dashed rgba(173,122,34,.35);animation:spin 34s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.seal-hero span{font-size:54px;}
+.hero-title{font-family:'Cinzel',serif;font-size:29px;color:var(--gold-deep);letter-spacing:2px;}
+.hero-sub{color:var(--ink-soft);font-size:14.5px;max-width:320px;line-height:1.55;}
+.hero-quote{font-family:'Cinzel',serif;font-size:14.5px;color:var(--violet-deep);font-style:italic;
+  border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:10px 6px;max-width:300px;}
+
+/* ================= VERIFICATION FLOW ================= */
+.verify-steps{display:flex;gap:6px;margin:6px 0 18px;}
+.verify-steps i{flex:1;height:4px;border-radius:3px;background:var(--line-strong);}
+.verify-steps i.done{background:linear-gradient(90deg,var(--sage),var(--gold));}
+.verify-steps i.now{background:var(--gold-bright);}
+.vcard{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:26px 22px;text-align:center;
+  width:100%;box-shadow:var(--shadow-card);}
+.vcard h3{font-family:'Cinzel',serif;color:var(--gold-deep);font-size:19px;margin-bottom:6px;}
+.vcard p{color:var(--ink-soft);font-size:13.5px;line-height:1.5;margin-bottom:18px;}
+.scan-ring{width:150px;height:150px;border-radius:50%;margin:0 auto 20px;position:relative;display:flex;align-items:center;
+  justify-content:center;background:var(--surface-soft);border:2px solid var(--line);overflow:hidden;}
+.scan-ring span{font-size:56px;}
+.scan-line{position:absolute;left:6%;right:6%;height:2px;background:linear-gradient(90deg,transparent,var(--sage),transparent);
+  box-shadow:0 0 12px var(--sage);animation:scan 1.6s ease-in-out infinite;}
+@keyframes scan{0%{top:8%;}50%{top:88%;}100%{top:8%;}}
+.scan-ring.locked{border-color:var(--sage);}
+.scan-ring.locked .scan-line{display:none;}
+.id-upload{border:1.5px dashed var(--line-strong);border-radius:14px;padding:22px;color:var(--ink-soft);font-size:13px;
+  margin-bottom:18px;cursor:pointer;background:var(--surface-soft);}
+.id-upload.filled{border-color:var(--sage);color:var(--sage-deep);background:var(--sage-wash);}
+.id-upload b{display:block;color:var(--ink);font-size:14px;margin-bottom:4px;}
+.status-chip{display:inline-flex;align-items:center;gap:6px;background:var(--sage-wash);color:var(--sage-deep);
+  border:1px solid rgba(44,140,102,.3);font-size:12px;font-weight:700;padding:5px 12px;border-radius:999px;margin-bottom:14px;}
+
+/* ================= GUILD CARD ================= */
+.guild-card{width:100%;aspect-ratio:1.58/1;border-radius:18px;position:relative;padding:18px 20px;
+  background:linear-gradient(125deg,var(--gold-wash),var(--violet-wash)),linear-gradient(160deg,#fff,var(--surface-soft));
+  border:1px solid var(--line);overflow:hidden;box-shadow:var(--shadow-card);margin-bottom:18px;color:var(--ink);}
+.guild-card::after{content:"";position:absolute;top:-60%;left:-20%;width:60%;height:220%;
+  background:linear-gradient(75deg,transparent,rgba(255,255,255,.55),transparent);animation:shine 3s ease-in-out infinite;}
+@keyframes shine{0%{transform:translateX(-40%);}100%{transform:translateX(340%);}}
+.gc-top{display:flex;justify-content:space-between;align-items:flex-start;}
+.gc-brand{font-family:'Cinzel',serif;font-size:12.5px;color:var(--gold-deep);letter-spacing:1.5px;}
+.gc-rank{font-family:'Cinzel',serif;font-size:15px;color:var(--gold-deep);border:1.5px solid var(--gold);border-radius:999px;
+  min-width:34px;height:34px;padding:0 9px;display:flex;align-items:center;justify-content:center;background:#fff;white-space:nowrap;}
+.gc-name{font-size:19px;font-weight:800;margin-top:18px;}
+.gc-meta{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink-faint);margin-top:4px;letter-spacing:.4px;}
+.gc-bottom{display:flex;justify-content:space-between;align-items:flex-end;margin-top:14px;}
+.gc-verified{font-size:11px;color:var(--sage-deep);font-weight:700;display:flex;align-items:center;gap:5px;}
+
+/* ================= SECTION HEADERS ================= */
+.section-title{font-family:'Cinzel',serif;font-size:18px;color:var(--gold-deep);margin:16px 0 4px;letter-spacing:.3px;}
+.section-sub{color:var(--ink-faint);font-size:12.5px;margin-bottom:12px;line-height:1.5;}
+
+/* ================= QUEST BOARD ================= */
+.filters{display:flex;gap:8px;overflow-x:auto;padding-bottom:10px;margin-bottom:6px;scrollbar-width:none;}
+.filters::-webkit-scrollbar{display:none;}
+.chip{flex:0 0 auto;padding:8px 14px;border-radius:999px;background:var(--surface);border:1px solid var(--line-strong);
+  color:var(--ink-soft);font-size:12.5px;font-weight:700;cursor:pointer;white-space:nowrap;}
+.chip.active{background:linear-gradient(135deg,var(--violet),var(--violet-deep));color:#fff;border-color:transparent;}
+
+.qcard{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:14px;
+  box-shadow:var(--shadow-card);position:relative;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease;}
+.qcard:active{transform:scale(.985);}
+.qcard-top{display:flex;gap:12px;align-items:flex-start;}
+.qicon{width:54px;height:54px;border-radius:15px;display:flex;align-items:center;justify-content:center;font-size:28px;
+  flex:0 0 54px;box-shadow:inset 0 0 0 1px rgba(34,28,52,.06);}
+.qcard-body{flex:1;min-width:0;}
+.qcard-title{font-weight:800;font-size:15px;line-height:1.3;}
+.qcard-loc{color:var(--ink-faint);font-size:12px;margin-top:2px;display:flex;align-items:center;gap:4px;}
+.tier{position:absolute;top:14px;right:14px;font-family:'Cinzel',serif;font-weight:700;font-size:12px;padding:3px 9px;
+  border-radius:8px;letter-spacing:.5px;}
+.tier-S{background:var(--coral-wash);color:var(--coral-deep);border:1px solid rgba(190,77,56,.3);}
+.tier-A{background:var(--gold-wash);color:var(--gold-deep);border:1px solid rgba(173,122,34,.3);}
+.tier-B{background:var(--violet-wash);color:var(--violet-deep);border:1px solid rgba(91,75,158,.3);}
+.qcard-desc{font-size:12.6px;color:var(--ink-soft);margin:10px 0 12px;line-height:1.45;}
+.qcard-foot{display:flex;align-items:center;justify-content:space-between;}
+.reward{font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--sage-deep);font-size:15px;}
+.slots{font-size:11.5px;color:var(--ink-faint);display:flex;align-items:center;gap:6px;}
+.slots-bar{width:46px;height:5px;background:var(--canvas-deep);border-radius:3px;overflow:hidden;}
+.slots-fill{height:100%;background:linear-gradient(90deg,var(--sage),var(--gold));}
+.qcard button.viewbtn{margin-top:12px;width:100%;}
+.quest-grid{display:grid;grid-template-columns:1fr;gap:0;}
+
+.how-shine{margin-top:22px;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:18px;
+  display:flex;flex-direction:column;gap:14px;box-shadow:var(--shadow-card);}
+.how-title{display:flex;align-items:center;gap:12px;}
+.how-shield{width:44px;height:44px;border-radius:13px;background:var(--gold-wash);display:flex;align-items:center;
+  justify-content:center;font-size:22px;flex:0 0 44px;}
+.how-title b{font-size:14px;color:var(--ink);display:block;}
+.how-title small{color:var(--ink-faint);font-size:11px;display:block;margin-top:2px;}
+.how-step{display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--ink-soft);}
+.how-step span{width:30px;height:30px;border-radius:9px;background:var(--surface-soft);border:1px solid var(--line);
+  display:flex;align-items:center;justify-content:center;font-size:15px;flex:0 0 30px;}
+.how-step b{font-weight:700;color:var(--ink);}
+
+/* ---- Board dashboard shell: mobile-first, widened for desktop below ---- */
+.shine-dashboard{display:block;}
+.shine-main{min-width:0;}
+.shine-right-rail{display:none;}
+.shine-hero-banner{min-height:150px;border-radius:22px;position:relative;overflow:hidden;display:flex;
+  align-items:center;padding:18px 20px;gap:14px;margin-bottom:6px;border:1px solid var(--line);box-shadow:var(--shadow-card);
+  background:linear-gradient(120deg,var(--gold-wash),var(--violet-wash));}
+.hero-art{font-size:56px;line-height:1;filter:drop-shadow(0 8px 8px rgba(34,28,52,.16));flex:0 0 auto;}
+.hero-copy{min-width:0;}
+.hero-mini{font:800 9.5px 'JetBrains Mono';letter-spacing:1.6px;color:var(--violet-deep);}
+.shine-hero-banner h1{font-family:'Cinzel',serif;font-size:19px;line-height:1.22;color:var(--gold-deep);margin:4px 0 9px;}
+.shine-hero-banner h1 em{font-style:normal;color:var(--violet-deep);}
+.hero-trust-row{display:flex;gap:6px;flex-wrap:wrap;}
+.hero-trust-row span{background:rgba(255,255,255,.72);border:1px solid var(--line);border-radius:14px;
+  padding:5px 8px;font-size:8.5px;font-weight:800;color:var(--ink);}
+.hero-post{display:none;}
+.quest-heading{display:flex;align-items:center;justify-content:space-between;margin:16px 0 8px;}
+.quest-heading .section-title{margin:0;}
+.view-all-btn{border:1px solid var(--line-strong);background:var(--violet-wash);color:var(--violet-deep);
+  border-radius:17px;padding:7px 12px;font:800 10.5px 'Manrope';cursor:pointer;flex-shrink:0;}
+
+/* ================= BOTTOM NAV ================= */
+.bottomnav{flex-shrink:0;z-index:100;display:flex;justify-content:space-around;align-items:stretch;
+  padding:9px 6px calc(10px + env(safe-area-inset-bottom));background:rgba(255,255,255,.94);backdrop-filter:blur(14px);
+  border-top:1px solid var(--line);}
+.navbtn{background:none;border:none;color:var(--ink-faint);display:flex;flex-direction:column;align-items:center;
+  gap:3px;font-size:9.5px;font-weight:700;cursor:pointer;padding:5px 10px;border-radius:12px;min-width:56px;}
+.navbtn .ic{font-size:20px;}
+.navbtn.active{color:var(--gold-deep);background:var(--gold-wash);}
+
+/* ================= SIDEBAR (DESKTOP) ================= */
+.shine-sidebar{display:none;}
+
+/* ================= MODAL / SHEET ================= */
+.overlay{position:fixed;inset:0;background:rgba(34,28,52,.4);backdrop-filter:blur(3px);z-index:500;display:none;
+  align-items:flex-end;justify-content:center;}
+.overlay.active{display:flex;}
+.sheet{background:var(--surface);width:100%;max-width:480px;border-radius:22px 22px 0 0;border:1px solid var(--line);
+  border-bottom:none;padding:22px 20px 26px;max-height:88vh;overflow-y:auto;animation:sheetup .3s ease;box-shadow:var(--shadow-pop);}
+@keyframes sheetup{from{transform:translateY(30px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+.sheet-handle{width:40px;height:4px;background:var(--line-strong);border-radius:3px;margin:0 auto 16px;}
+.row-info{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line);font-size:13.5px;}
+.row-info span:first-child{color:var(--ink-faint);}
+.person-card{display:flex;gap:12px;align-items:center;background:var(--surface-soft);border:1px solid var(--line);
+  border-radius:14px;padding:12px;margin:14px 0;}
+.avatar{width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,var(--violet),var(--rose));
+  display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:16px;flex:0 0 46px;}
+.person-name{font-weight:800;font-size:14.5px;}
+.person-sub{font-size:11.5px;color:var(--ink-faint);}
+.stars{color:var(--gold);font-size:12px;letter-spacing:1px;}
+
+.quick-sheet{max-width:520px;border-radius:24px 24px 0 0;}
+.quick-sheet h3{color:var(--gold-deep);font-family:'Cinzel',serif;margin-bottom:8px;}
+.quick-list{display:flex;flex-direction:column;gap:9px;margin-top:14px;}
+.quick-row{display:flex;align-items:center;gap:11px;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--surface-soft);}
+.quick-row .qico{width:36px;height:36px;border-radius:11px;background:var(--violet-wash);color:var(--violet-deep);
+  display:flex;align-items:center;justify-content:center;font-size:19px;flex:0 0 36px;}
+.quick-row b{display:block;font-size:12px;color:var(--ink);}
+.quick-row small{display:block;color:var(--ink-faint);font-size:10px;margin-top:2px;}
+.repair-list{display:grid;gap:8px;margin:12px 0;}
+.repair-item{display:flex;align-items:center;gap:10px;padding:11px 12px;background:var(--surface-soft);border:1px solid var(--line);
+  border-radius:12px;color:var(--ink);font-size:12px;}
+.repair-item span{font-size:18px;width:24px;text-align:center;flex:0 0 24px;}
+
+/* ================= ACTIVE QUEST ================= */
+.timeline{margin:16px 0;}
+.tstep{display:flex;gap:12px;padding-bottom:20px;position:relative;}
+.tstep::before{content:"";position:absolute;left:11px;top:26px;bottom:0;width:2px;background:var(--line);}
+.tstep:last-child::before{display:none;}
+.tdot{width:24px;height:24px;border-radius:50%;background:var(--surface-soft);border:2px solid var(--line-strong);
+  flex:0 0 24px;display:flex;align-items:center;justify-content:center;font-size:12px;z-index:1;}
+.tdot.done{background:var(--sage);border-color:var(--sage);color:#fff;}
+.tdot.now{background:var(--gold-bright);border-color:var(--gold);color:#3A2606;box-shadow:0 0 0 5px rgba(173,122,34,.16);}
+.tstep h4{font-size:14px;font-weight:800;}
+.tstep p{font-size:12px;color:var(--ink-faint);margin-top:2px;}
+
+.map-box{border-radius:16px;overflow:hidden;border:1px solid var(--line);height:150px;position:relative;margin-bottom:14px;
+  background:linear-gradient(160deg,var(--sage-wash),var(--surface-soft));}
+.map-box::before{content:"";position:absolute;inset:0;background-image:
+  linear-gradient(rgba(44,140,102,.14) 1px,transparent 1px),linear-gradient(90deg,rgba(44,140,102,.14) 1px,transparent 1px);
+  background-size:22px 22px;}
+.map-box::after{content:"MAP PREVIEW • QUEST LOCATION";position:absolute;left:10px;top:10px;
+  font:700 8.5px 'JetBrains Mono';letter-spacing:.6px;color:var(--sage-deep);background:rgba(255,255,255,.8);
+  padding:5px 8px;border-radius:7px;}
+.map-pin{position:absolute;top:50%;left:50%;transform:translate(-50%,-100%);font-size:30px;
+  filter:drop-shadow(0 6px 8px rgba(0,0,0,.25));animation:pinPulse 1.8s ease-in-out infinite;}
+@keyframes pinPulse{50%{transform:translate(-50%,-100%) scale(1.1);}}
+
+/* Real Google Maps embed (no API key — google.com/maps?...&output=embed).
+   The map iframe starts non-interactive so a page-scroll that passes over
+   it scrolls the page, not the map; one tap unlocks panning/zoom inside it. */
+.map-box.real-map::before,.map-box.real-map::after,.mini-map.real-map .map-dot,.mini-map.real-map .map-home{display:none;}
+.map-box.real-map .map-pin{display:none;}
+.real-map-frame{position:absolute;inset:0;border:0;}
+.real-map-frame.locked{pointer-events:none;}
+.map-tap-hint{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  background:rgba(20,15,32,.28);color:#fff;font:800 11.5px 'Manrope';letter-spacing:.2px;cursor:pointer;
+  text-align:center;padding:10px;transition:opacity .2s ease;}
+.map-tap-hint span{background:rgba(20,15,32,.55);padding:7px 14px;border-radius:999px;backdrop-filter:blur(3px);}
+.map-tap-hint.gone{opacity:0;pointer-events:none;}
+.map-locate-btn{position:absolute;right:8px;bottom:8px;z-index:2;background:#fff;border:1px solid var(--line-strong);
+  width:32px;height:32px;border-radius:9px;font-size:15px;cursor:pointer;box-shadow:0 4px 10px rgba(0,0,0,.15);}
+
+.evidence-drop{border:1.5px dashed var(--line-strong);border-radius:14px;padding:26px;text-align:center;
+  color:var(--ink-faint);font-size:13px;margin-bottom:14px;cursor:pointer;}
+.evidence-drop.filled{border-color:var(--sage);background:var(--sage-wash);color:var(--sage-deep);}
+
+.payout{background:linear-gradient(135deg,var(--gold-wash),var(--sage-wash));border:1px solid var(--line);
+  border-radius:16px;padding:18px;text-align:center;margin:10px 0 16px;}
+.payout .amt{font-family:'JetBrains Mono';font-size:29px;font-weight:700;color:var(--gold-deep);}
+.payout .lbl{font-size:11.5px;color:var(--ink-faint);margin-top:2px;}
+
+.star-picker{display:flex;gap:8px;justify-content:center;margin:16px 0;}
+.star-picker span{font-size:32px;cursor:pointer;filter:grayscale(1) opacity(.35);}
+.star-picker span.on{filter:none;}
+.tag-row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:16px;}
+.tag{padding:7px 13px;border-radius:999px;background:var(--surface-soft);border:1px solid var(--line-strong);
+  font-size:12px;color:var(--ink-soft);cursor:pointer;}
+.tag.sel{background:var(--sage);color:#fff;border-color:transparent;font-weight:700;}
+
+/* ================= PROFILE ================= */
+.rank-bar{height:8px;border-radius:5px;background:var(--canvas-deep);overflow:hidden;margin-top:8px;}
+.rank-fill{height:100%;background:linear-gradient(90deg,var(--sage),var(--gold));}
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0;}
+.stat-box{background:var(--surface-soft);border:1px solid var(--line);border-radius:14px;padding:12px 8px;text-align:center;}
+.stat-box .n{font-family:'JetBrains Mono';font-weight:700;font-size:17px;color:var(--gold-deep);}
+.stat-box .l{font-size:10px;color:var(--ink-faint);margin-top:2px;}
+
+/* ================= SUPPORT ================= */
+.msg{max-width:78%;padding:10px 13px;border-radius:14px;font-size:13px;margin-bottom:8px;line-height:1.4;}
+.msg.them{background:var(--surface-soft);border:1px solid var(--line);}
+.msg.me{background:linear-gradient(135deg,var(--violet),var(--violet-deep));color:#fff;margin-left:auto;}
+.dispute-timeline{display:flex;justify-content:space-between;margin:14px 0 20px;position:relative;}
+.dispute-timeline::before{content:"";position:absolute;top:11px;left:5%;right:5%;height:2px;background:var(--line);z-index:0;}
+.dt-node{display:flex;flex-direction:column;align-items:center;gap:6px;z-index:1;flex:1;}
+.dt-dot{width:22px;height:22px;border-radius:50%;background:var(--surface);border:2px solid var(--line-strong);
+  display:flex;align-items:center;justify-content:center;font-size:11px;}
+.dt-dot.on{background:var(--gold);border-color:var(--gold);color:#fff;}
+.dt-node span{font-size:9.5px;color:var(--ink-faint);text-align:center;}
+
+.warn-box{background:var(--coral-wash);border:1px solid rgba(190,77,56,.3);border-radius:14px;padding:14px;
+  font-size:12.5px;color:var(--coral-deep);line-height:1.5;margin-bottom:16px;}
+.warn-box b{color:var(--coral-deep);}
+
+/* ================= TOAST ================= */
+#toast{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-160%);background:var(--ink);
+  color:#fff;padding:12px 18px;border-radius:12px;font-size:13px;font-weight:700;z-index:900;
+  box-shadow:0 16px 34px rgba(34,28,52,.35);transition:transform .35s cubic-bezier(.2,.9,.3,1.3),opacity .25s ease;
+  display:flex;align-items:center;gap:8px;max-width:90%;opacity:0;visibility:hidden;}
+#toast.show{transform:translateX(-50%) translateY(0);opacity:1;visibility:visible;}
+
+/* ================= CAMERA / IDENTITY MODALS ================= */
+.camera-modal,.identity-modal{position:fixed;inset:0;background:rgba(34,28,52,.45);backdrop-filter:blur(10px);
+  z-index:600;display:none;align-items:center;justify-content:center;padding:18px;}
+.camera-modal.active,.identity-modal.active{display:flex;}
+.camera-card,.identity-card{width:min(430px,100%);background:var(--surface);border:1px solid var(--line);
+  border-radius:26px;padding:18px;box-shadow:var(--shadow-pop);max-height:92vh;overflow-y:auto;}
+.camera-head,.identity-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.camera-head h3,.identity-head h3{font-family:'Cinzel',serif;color:var(--gold-deep);font-size:16px;}
+.camera-close,.identity-close{border:none;background:var(--surface-soft);width:36px;height:36px;border-radius:50%;
+  font-size:18px;cursor:pointer;color:var(--ink-soft);}
+.camera-frame{height:300px;border-radius:20px;overflow:hidden;background:var(--ink);position:relative;
+  display:flex;align-items:center;justify-content:center;}
+.camera-frame video,.camera-frame canvas{width:100%;height:100%;object-fit:cover;}
+.camera-guide{position:absolute;width:190px;height:245px;border:2px solid rgba(255,255,255,.9);
+  border-radius:48% 48% 43% 43%;box-shadow:0 0 0 999px rgba(20,15,32,.35);pointer-events:none;}
+.camera-hint{position:absolute;left:12px;right:12px;bottom:12px;text-align:center;background:rgba(20,15,32,.65);
+  color:#fff;border-radius:10px;padding:8px;font-size:11px;}
+.camera-actions{display:flex;gap:9px;margin-top:12px;}
+.camera-actions .btn{flex:1;}
+.capture-preview,.id-preview{display:none;margin-top:10px;border-radius:14px;max-height:150px;width:100%;object-fit:cover;}
+.camera-fallback{padding:14px;margin-top:10px;border:1px dashed var(--line-strong);border-radius:14px;
+  background:var(--surface-soft);color:var(--ink-soft);font-size:11px;line-height:1.45;text-align:center;}
+.camera-fallback b{color:var(--violet-deep);}
+
+.scan-pad{height:220px;border-radius:20px;background:radial-gradient(circle at center,var(--surface),var(--surface-soft));
+  display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;border:1px solid var(--line);}
+.finger-icon{font-size:88px;opacity:.85;}
+.finger-wave{position:absolute;left:15%;right:15%;height:3px;background:var(--sage);box-shadow:0 0 18px var(--sage);animation:fscan 1.8s infinite;}
+@keyframes fscan{0%{top:18%;}50%{top:82%;}100%{top:18%;}}
+
+.identity-tabs{display:flex;gap:6px;background:var(--surface-soft);border:1px solid var(--line);border-radius:12px;
+  padding:4px;margin-bottom:14px;}
+.identity-tab{flex:1;border:none;background:none;padding:9px 6px;border-radius:9px;font-weight:800;font-size:11.5px;
+  color:var(--ink-soft);cursor:pointer;}
+.identity-tab.active{background:var(--surface);color:var(--gold-deep);box-shadow:0 2px 8px rgba(34,28,52,.1);}
+.id-camera-box{height:220px;border-radius:18px;overflow:hidden;background:var(--ink);position:relative;
+  display:flex;align-items:center;justify-content:center;}
+.id-camera-box video{width:100%;height:100%;object-fit:cover;}
+.id-guide{position:absolute;width:86%;height:64%;border:2px solid rgba(255,255,255,.85);border-radius:14px;pointer-events:none;}
+.camera-status{position:absolute;left:12px;right:12px;bottom:11px;background:rgba(20,15,32,.65);color:#fff;
+  border-radius:10px;padding:8px;text-align:center;font-size:10px;}
+.identity-actions{display:flex;gap:9px;margin-top:12px;}
+.identity-actions .btn{flex:1;}
+.fingerprint-box{height:230px;border-radius:20px;border:1px solid var(--line);
+  background:radial-gradient(circle at center,var(--surface),var(--surface-soft));
+  display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+.fingerprint-svg{width:130px;height:158px;opacity:.85;}
+.fingerprint-scanline{position:absolute;left:16%;right:16%;height:3px;background:var(--sage);
+  box-shadow:0 0 20px rgba(44,140,102,.7);animation:fingerScan 1.8s infinite;}
+@keyframes fingerScan{0%{top:22%;}50%{top:78%;}100%{top:22%;}}
+.bio-note{margin-top:11px;padding:10px 12px;border-radius:12px;background:var(--surface-soft);
+  color:var(--ink-soft);font-size:10.5px;line-height:1.5;}
+.identity-success{display:none;text-align:center;padding:26px 10px;}
+.identity-success .success-icon{font-size:52px;}
+.identity-success h4{margin:10px 0 5px;font:700 18px 'Cinzel',serif;color:var(--violet-deep);}
+.identity-success p{margin:0;color:var(--ink-soft);font-size:11px;}
+
+/* ================= MISC / A11Y ================= */
+button,[role="button"],.chip,.icon-pick,.tag,.id-upload,.evidence-drop{-webkit-user-select:none;user-select:none;touch-action:manipulation;}
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important;}
+}
+
+/* ================================================================
+   DESKTOP LAYOUT (>=960px): sidebar navigation + two-column dashboard
+   ================================================================ */
+@media (min-width:960px){
+  body{overflow:auto;}
+  .app{max-width:none;width:100%;min-height:100vh;height:auto;box-shadow:none;background:transparent;
+    overflow:visible;}
+  /* .app's base rule sets overflow:hidden for the mobile app-shell — needed
+     there to contain the fixed-height shell and stop double scrollbars.
+     On desktop it's not just unnecessary, it actively breaks the sticky
+     topbar: overflow:hidden makes .app count as a CSS "scroll container"
+     even though it never actually scrolls (the real page/document does),
+     so position:sticky was anchoring to the wrong box and the topbar
+     scrolled away instead of staying pinned. overflow:visible here lets
+     sticky bind to the real document scroll again. */
+  .screen{overflow:visible;}
+  #screen-board{overflow:visible;}
+  .topbar{position:sticky;top:0;padding:14px 32px;height:auto;}
+  .top-tagline{display:block;position:absolute;left:50%;transform:translateX(-50%);}
+  .role-pill{display:none;}
+  .guild-status{max-width:1240px;margin:0 auto 6px;}
+  .bottomnav{display:none;}
+
+  .shine-sidebar{display:flex;flex-direction:column;position:fixed;z-index:95;top:96px;left:24px;
+    width:190px;max-height:calc(100vh - 116px);background:var(--surface);border:1px solid var(--line);border-radius:20px;
+    padding:14px 10px;box-shadow:var(--shadow-card);overflow-y:auto;gap:0;}
+  .side-section{display:flex;flex-direction:column;gap:4px;}
+  .side-item{width:100%;border:none;background:transparent;border-radius:12px;padding:11px 10px;display:flex;
+    align-items:center;gap:11px;color:var(--ink);font:700 12.5px 'Manrope';text-align:left;cursor:pointer;}
+  .side-item span{width:20px;text-align:center;font-size:17px;color:var(--violet-deep);}
+  .side-item.active{background:var(--gold-wash);color:var(--gold-deep);}
+  .side-item.active span{color:var(--gold-deep);}
+  .side-item:hover{background:var(--surface-soft);}
+  .side-divider{height:1px;background:var(--line);margin:10px 4px;}
+  .side-label{font:800 8px 'JetBrains Mono';letter-spacing:1.2px;color:var(--ink-faint);padding:0 10px 5px;}
+
+  .screen{padding:20px 32px 48px;max-width:640px;width:100%;margin:0 auto;}
+  #screen-board{max-width:none;margin:0;padding-left:250px;}
+  .shine-dashboard{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:22px;max-width:1240px;margin:0 auto;}
+  .shine-main{min-width:0;}
+
+  .shine-hero-banner{min-height:172px;border-radius:24px;position:relative;overflow:hidden;display:flex;
+    align-items:center;padding:22px 28px;gap:20px;border:1px solid var(--line);box-shadow:var(--shadow-card);
+    background:linear-gradient(110deg,var(--gold-wash),var(--violet-wash));}
+  .hero-art{font-size:100px;line-height:1;filter:drop-shadow(0 12px 10px rgba(34,28,52,.18));z-index:1;}
+  .hero-copy{z-index:2;}
+  .hero-mini{font:800 11px 'JetBrains Mono';letter-spacing:2px;color:var(--violet-deep);}
+  .shine-hero-banner h1{font-family:'Cinzel',serif;font-size:27px;line-height:1.18;color:var(--gold-deep);margin:5px 0 13px;}
+  .shine-hero-banner h1 em{font-style:normal;color:var(--violet-deep);}
+  .hero-trust-row{display:flex;gap:7px;flex-wrap:wrap;}
+  .hero-trust-row span{background:rgba(255,255,255,.7);border:1px solid var(--line);border-radius:15px;
+    padding:7px 9px;font-size:9px;font-weight:800;color:var(--ink);}
+  .hero-post{display:flex;width:auto;min-width:155px;z-index:2;margin-left:auto;}
+
+  .quest-heading{display:flex;align-items:center;justify-content:space-between;margin:22px 0 9px;}
+  .quest-heading .section-title{margin:0;font-size:20px;}
+  .view-all-btn{border:1px solid var(--line-strong);background:var(--violet-wash);color:var(--violet-deep);
+    border-radius:17px;padding:8px 14px;font:800 11px 'Manrope';cursor:pointer;}
+  #screen-board .filters{margin-bottom:14px;overflow-x:auto;flex-wrap:nowrap;}
+  .quest-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;}
+  .quest-grid .qcard{margin:0;min-height:250px;padding:17px;}
+  .quest-grid .qcard-title{font-size:15.5px;}
+  .quest-grid .qcard-desc{min-height:56px;}
+
+  .how-shine{flex-direction:row;align-items:center;flex-wrap:wrap;gap:16px;}
+  .how-title{flex:0 0 auto;}
+
+  .shine-right-rail{display:flex;flex-direction:column;gap:15px;}
+  .rail-card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px;box-shadow:var(--shadow-card);}
+  .rail-title{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--ink);margin-bottom:12px;}
+  .rail-title b{font-size:9px;}
+  .trust-card{border-color:rgba(173,122,34,.3);background:linear-gradient(145deg,var(--gold-wash),var(--surface));}
+  .trust-card .rail-title span{font-family:'Cinzel',serif;color:var(--gold-deep);font-size:13px;}
+  .trust-card .rail-title b{background:#fff;color:var(--gold-deep);border-radius:10px;padding:5px 8px;}
+  .verify-line{font-size:10.5px;color:var(--ink-soft);margin:8px 0;}
+  .verify-line:first-letter{color:var(--sage);}
+  .rail-btn{width:100%;border:1px solid rgba(173,122,34,.35);background:var(--gold-wash);color:var(--gold-deep);
+    border-radius:12px;padding:9px;font:800 10.5px 'Manrope';cursor:pointer;margin-top:6px;}
+  .rail-btn.purple{background:linear-gradient(135deg,var(--violet),var(--violet-deep));border:none;color:#fff;}
+  .live-pill{color:var(--violet-deep);background:var(--violet-wash);border-radius:10px;padding:5px 8px;}
+  .mini-map{height:150px;border-radius:13px;position:relative;overflow:hidden;border:1px solid var(--line);
+    background:linear-gradient(150deg,var(--sage-wash),var(--surface-soft));}
+  .map-dot{position:absolute;font-size:14px;color:var(--coral);}
+  .map-dot.d1{top:25%;left:30%;}.map-dot.d2{top:55%;left:60%;}.map-dot.d3{top:70%;left:22%;}.map-dot.d4{top:38%;left:78%;}
+  .map-home{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:22px;}
+  .worker-mini{display:flex;align-items:center;gap:9px;padding:8px 0;font-size:12px;}
+  .worker-mini .mini-avatar{width:30px;height:30px;border-radius:9px;background:var(--violet-wash);color:var(--violet-deep);
+    display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;flex:0 0 30px;}
+  .worker-mini b{display:block;font-size:12px;color:var(--ink);}
+  .worker-mini small{color:var(--gold);}
+  .worker-mini strong{margin-left:auto;font-family:'JetBrains Mono';color:var(--sage-deep);}
+  .support-card{text-align:left;}
+  .support-icon{width:34px;height:34px;border-radius:10px;background:var(--violet-wash);color:var(--violet-deep);
+    display:flex;align-items:center;justify-content:center;font-size:16px;margin-bottom:8px;}
+}
+@media (min-width:960px) and (max-width:1220px){
+  .shine-hero-banner{flex-wrap:wrap;}
+  .hero-post{flex-basis:100%;margin-left:0;margin-top:6px;}
+}
+</style>
+</head>
+<body>
+<div id="stars"></div>
+<div class="app">
+
+  <div class="topbar" id="topbar">
+    <div class="brand">
+      <div class="brand-mark">✨</div>
+      <div>
+        <div class="brand-name">SHINE</div>
+        <div class="brand-tag">GUILD OF TRUST</div>
+      </div>
+    </div>
+    <div class="top-tagline">✨ <b>I need a trusted person for some small work</b> ✨</div>
+    <div class="top-actions">
+      <button class="top-icon" onclick="openQuickPanel('notifications')">🔔<i>3</i></button>
+      <button class="top-icon" onclick="openQuickPanel('messages')">💬</button>
+      <div class="profile-pill" onclick="go('profile')" style="cursor:pointer">
+        <div class="profile-avatar" id="pillAvatar">?</div>
+        <div><b id="pillName">Guild Member</b><small>● Verified Member</small></div>
+        <span>⌄</span>
+      </div>
+    </div>
+    <div class="role-pill" id="rolePill">
+      <button id="btnWorker" class="active" onclick="setRole('worker')">Worker</button>
+      <button id="btnClient" onclick="setRole('client')">Client</button>
+    </div>
+  </div>
+
+<div class="guild-status" id="guildStatus">
+  <span>🛡️ <b>VERIFIED GUILD</b></span>
+  <span>•</span>
+  <span id="nearbyCount">23 trusted workers nearby</span>
+  <span class="status-live">● LIVE</span>
+</div>
+
+
+<!-- ===== SHINE DESKTOP GUILD DASHBOARD ===== -->
+<aside class="shine-sidebar" id="shineSidebar">
+  <div class="side-section">
+    <button class="side-item" data-nav="board" onclick="go('board')"><span>⌂</span> Home</button>
+    <button class="side-item" data-nav="post" onclick="setRole('client')"><span>🖋</span> Post a Quest</button>
+    <button class="side-item" data-nav="active" onclick="go('active')"><span>🧭</span> My Quests</button>
+    <button class="side-item" onclick="openQuickPanel('workers')"><span>👥</span> Workers</button>
+    <button class="side-item" onclick="openQuickPanel('messages')"><span>✉</span> Messages</button>
+    <button class="side-item" data-nav="profile" onclick="go('profile');toast('Ratings opened')"><span>★</span> Ratings</button>
+    <button class="side-item" data-nav="support" onclick="go('support')"><span>◉</span> Support</button>
+  </div>
+  <div class="side-divider"></div>
+  <div class="side-label">VERIFICATION</div>
+  <button class="side-item" data-nav="profile" onclick="go('profile')"><span>🛡</span> My Verification</button>
+  <div class="side-divider"></div>
+  <div class="side-label">GUILD COUNCIL</div>
+  <button class="side-item" onclick="openDisputeInfo()"><span>⚖</span> Dispute Help</button>
+  <button class="side-item" onclick="openQuickPanel('rules')"><span>▤</span> Rules</button>
+</aside>
+
+  <!-- ================= LOGIN ================= -->
+  <div class="screen active" id="screen-login">
+    <div class="seal-hero"><span>🛡️</span></div>
+    <div class="hero-title">SHINE</div>
+    <div class="hero-sub">A guild board for small trusted errands — someone verified, nearby, and ready when you can't be there yourself.</div>
+    <div class="hero-quote">"I need a trusted person for some small work."</div><div class="center-note">Prototype: biometric, government-ID, escrow and anti-fraud checks are simulated in this HTML demo.</div>
+    <div class="login-actions">
+      <button class="btn btn-gold" onclick="go('verify1')">⚔️ Join the Guild</button>
+      <button class="btn btn-ghost" onclick="loginExisting()">Sign In — Already a Member</button>
+    </div>
+  </div>
+
+  <!-- ================= VERIFY STEP 1: FACE ================= -->
+  <div class="screen" id="screen-verify1">
+    <button class="backbtn" onclick="go('login')">← Back</button>
+    <div class="section-title">Forge Your Guild Card</div>
+    <div class="section-sub">Step 1 of 3 — Face Verification</div>
+    <div class="verify-steps"><i class="now"></i><i></i><i></i></div>
+    <div class="vcard">
+      <h3>Look into the light</h3>
+      <p>We match your live face against your ID photo. This confirms a real person is registering — not a photo or a bot.</p>
+      <div class="scan-ring" id="faceRing"><span>🙂</span><div class="scan-line"></div></div>
+      <button class="btn btn-sage" style="width:100%" onclick="openCamera('face')">📷 Open Camera & Capture Face</button>
+    </div>
+  </div>
+
+  <!-- ================= VERIFY STEP 2: ID ================= -->
+  <div class="screen" id="screen-verify2">
+    <button class="backbtn" onclick="go('verify1')">← Back</button>
+    <div class="section-title">Forge Your Guild Card</div>
+    <div class="section-sub">Step 2 of 3 — Government ID</div>
+    <div class="verify-steps"><i class="done"></i><i class="now"></i><i></i></div>
+    <div class="vcard">
+      <h3>Scan your ID card</h3>
+      <p>Aadhaar, national ID, or passport. We read the chip/QR and cross-check the name, photo and ID number against government records.</p>
+      <div class="field" style="text-align:left">
+        <label>Full name (exactly as on your ID)</label>
+        <input id="nameInput" placeholder="e.g. Arjun Kumar" oninput="checkVerify2Ready()">
+      </div>
+      <div class="id-upload" id="idUpload" onclick="openIdentityModule('id')">
+        <b>📇 Tap to scan ID</b>
+        Front and back, or NFC chip tap
+      </div>
+      <button class="btn btn-sage" style="width:100%" onclick="confirmVerify2()" id="idNextBtn" disabled>Continue</button>
+      <div class="center-note" id="verify2Hint">Enter your name and scan your ID to continue</div>
+    </div>
+  </div>
+
+  <!-- ================= VERIFY STEP 3: FINGERPRINT ================= -->
+  <div class="screen" id="screen-verify3">
+    <button class="backbtn" onclick="go('verify2')">← Back</button>
+    <div class="section-title">Forge Your Guild Card</div>
+    <div class="section-sub">Step 3 of 3 — Fingerprint</div>
+    <div class="verify-steps"><i class="done"></i><i class="done"></i><i class="now"></i></div>
+    <div class="vcard">
+      <h3>Press and hold</h3>
+      <p>Your fingerprint is used as an on-site identity check when you arrive at a quest.</p>
+      <div class="scan-ring" id="printRing"><span>🖐️</span><div class="scan-line"></div></div>
+      <button class="btn btn-sage" style="width:100%" onclick="openIdentityModule('finger','register')">☝️ Open Fingerprint Scanner</button>
+    </div>
+  </div>
+
+  <!-- ================= VERIFY DONE / GUILD CARD ================= -->
+  <div class="screen" id="screen-verifydone" style="align-items:center;text-align:center;">
+    <div class="status-chip" style="margin-top:10px">✅ Identity Verified</div>
+    <div class="section-title" style="margin-top:0">Your Guild Card is ready</div>
+    <div class="guild-card">
+      <div class="gc-top">
+        <div>
+          <div class="gc-brand">SHINE GUILD CARD</div>
+          <div class="gc-name" id="gcName">Nithin R.</div>
+          <div class="gc-meta" id="gcMeta">ID •••• •••• 4471 &nbsp;·&nbsp; CHENNAI, IN</div>
+        </div>
+        <div class="gc-rank">New</div>
+      </div>
+      <div class="gc-bottom">
+        <div class="gc-verified">🛡️ Face · ID · Fingerprint Verified</div>
+        <div style="font-size:22px">✨</div>
+      </div>
+    </div>
+    <button class="btn btn-gold" style="width:100%" onclick="go('board')">Enter the Guild Hall</button>
+  </div>
+
+  <!-- ================= QUEST BOARD (WORKER) ================= -->
+  <div class="screen" id="screen-board">
+    <div class="shine-dashboard">
+
+      <section class="shine-main">
+        <div class="shine-hero-banner">
+          <div class="hero-art">🧑‍🚀</div>
+          <div class="hero-copy">
+            <div class="hero-mini">SHINE GUILD</div>
+            <h1>Trusted people.<br><em>Small works. Big help.</em></h1>
+            <div class="hero-trust-row">
+              <span>🛡️ Verified Users</span>
+              <span>🔒 Secure Payments</span>
+              <span>★ Fair Ratings</span>
+            </div>
+          </div>
+          <button class="btn btn-gold hero-post" onclick="setRole('client')">＋ Post a Quest</button>
+        </div>
+
+        <div class="quest-heading">
+          <div>
+            <div class="section-title">🔥 Latest Quests</div>
+            <div class="section-sub">Trusted people in your community ready to help</div>
+          </div>
+          <button class="view-all-btn" onclick="showAllQuests(this)">View All →</button>
+        </div>
+
+        <div class="filters">
+          <div class="chip active" onclick="filterQ(this,'all')">All</div>
+          <div class="chip" onclick="filterQ(this,'home')">🏠 Home Watch</div>
+          <div class="chip" onclick="filterQ(this,'tech')">🔧 Supervise Repair</div>
+          <div class="chip" onclick="filterQ(this,'elder')">👴 Elder Escort</div>
+          <div class="chip" onclick="filterQ(this,'child')">🧒 Child Pickup</div>
+          <div class="chip" onclick="filterQ(this,'company')">💬 Companionship</div>
+        </div>
+
+        <div id="questList" class="quest-grid"></div>
+
+        <div class="how-shine">
+          <div class="how-title">
+            <div class="how-shield">🛡️</div>
+            <div><b>How Shine<br>Works</b><small>Trust by design</small></div>
+          </div>
+          <div class="how-step"><span>📜</span><b>1. Client<br>Posts Quest</b></div>
+          <i>→</i>
+          <div class="how-step"><span>👥</span><b>2. Verified<br>Workers Accept</b></div>
+          <i>→</i>
+          <div class="how-step"><span>📷</span><b>3. Work Done &<br>Evidence</b></div>
+          <i>→</i>
+          <div class="how-step"><span>💰</span><b>4. Payment<br>Released</b></div>
+          <i>→</i>
+          <div class="how-step"><span>★</span><b>5. Rate &<br>Build Trust</b></div>
+        </div>
+      </section>
+
+      <aside class="shine-right-rail">
+        <div class="rail-card trust-card">
+          <div class="rail-title"><span>🛡️ Your Trust Status</span><b>Verified</b></div>
+          <div class="verify-line">✓ Face Recognition Verified</div>
+          <div class="verify-line">✓ ID Proof Verified</div>
+          <div class="verify-line">✓ Fingerprint Verified</div>
+          <button class="rail-btn" onclick="go('profile')">View Verification Details</button>
+        </div>
+
+        <div class="rail-card">
+          <div class="rail-title"><span>📍 Nearby Quests</span><b class="live-pill">Live Map</b></div>
+          <div class="mini-map" id="nearbyMapBox">
+            <span class="map-dot d1">●</span><span class="map-dot d2">●</span>
+            <span class="map-dot d3">●</span><span class="map-dot d4">●</span>
+            <span class="map-home">⌂</span>
+          </div>
+        </div>
+
+        <div class="rail-card">
+          <div class="rail-title"><span>⭐ Top Rated Workers</span></div>
+          <div class="worker-mini"><span class="mini-avatar">AR</span><div><b>Arjun R.</b><small>★★★★★</small></div><strong>4.9</strong></div>
+          <div class="worker-mini"><span class="mini-avatar">PM</span><div><b>Priya M.</b><small>★★★★★</small></div><strong>4.8</strong></div>
+          <div class="worker-mini"><span class="mini-avatar">KS</span><div><b>Karthik S.</b><small>★★★★★</small></div><strong>4.7</strong></div>
+        </div>
+
+        <div class="rail-card support-card">
+          <div class="support-icon">◉</div>
+          <div><b>Need Help?</b><small>Our support team is here for you.</small></div>
+          <button class="rail-btn purple" onclick="go('support')">Contact Support →</button>
+        </div>
+      </aside>
+
+    </div>
+  </div>
+
+  <!-- ================= POST QUEST (CLIENT) ================= -->
+  <div class="screen" id="screen-post">
+    <div class="section-title">Post a Quest</div>
+    <div class="section-sub">Describe the small job — the guild will find someone trusted, nearby.</div>
+
+    <div class="field">
+      <label>What kind of help?</label>
+      <div class="icon-grid" id="catGrid"></div>
+    </div>
+    <div class="field">
+      <label>Quest title</label>
+      <input id="pTitle" placeholder="e.g. Watch my house while I'm abroad">
+    </div>
+    <div class="field">
+      <label>What should the worker do?</label>
+      <textarea id="pDesc" placeholder="Be specific: what to check, how long, what to avoid..."></textarea>
+    </div>
+    <div class="field">
+      <label>Address</label>
+      <input id="pAddr" placeholder="Full address / landmark" value="14 Lattice Bridge Rd, Adyar, Chennai">
+    </div>
+    <div class="field">
+      <label>How urgent is this?</label>
+      <div class="tag-row" id="urgencyRow" style="justify-content:flex-start;margin-bottom:0">
+        <div class="tag urgency-tag" data-tier="B" onclick="setUrgency('B',this)">🟢 Flexible — anytime this week</div>
+        <div class="tag urgency-tag" data-tier="A" onclick="setUrgency('A',this)">🟡 Soon — within a day or two</div>
+        <div class="tag urgency-tag sel" data-tier="S" onclick="setUrgency('S',this)">🔴 Urgent — needed today</div>
+      </div>
+      <div class="section-sub" id="urgencyNote" style="margin:6px 0 0">Urgent quests are marked S RANK and shown first on the board — workers see the most urgent requests before anything else.</div>
+    </div>
+    <div class="field">
+      <label>Reward (₹)</label>
+      <input id="pReward" type="number" placeholder="500" value="600">
+    </div>
+    <div class="field">
+      <label>Workers needed</label>
+      <div class="stepper">
+        <button onclick="stepQty(-1)">−</button>
+        <span id="qtyVal" style="font-weight:800;font-family:'JetBrains Mono'">1</span>
+        <button onclick="stepQty(1)">+</button>
+      </div>
+    </div>
+    <div class="warn-box"><b>Identity check required.</b> You'll verify your face + fingerprint again before this quest goes live, so workers know the request is genuine.</div>
+    <button class="btn btn-gold" style="width:100%" onclick="postQuest()">🔏 Verify &amp; Post Quest</button>
+  </div>
+
+  <!-- ================= ACTIVE QUEST ================= -->
+  <div class="screen" id="screen-active">
+    <div class="section-title">Active Quest</div>
+    <div class="qcard" id="activeCardBox" style="margin-bottom:18px"></div>
+
+    <div id="activeQuestDetails">
+      <div class="map-box" id="activeMapBox">
+        <div class="map-pin">📍</div>
+      </div>
+      <div style="display:flex;gap:10px;margin-bottom:18px;">
+        <button class="btn btn-sage" style="flex:1" onclick="navigateToQuest()">🧭 Navigate</button>
+        <button class="btn btn-ghost" style="flex:1" onclick="openSheet('sheet-cancel')">Cancel Quest</button>
+      </div>
+
+      <div class="timeline" id="questTimeline"></div>
+
+      <div id="checkinBox"></div>
+      <div id="evidenceBox"></div>
+    </div>
+  </div>
+
+  <!-- ================= PROFILE ================= -->
+  <div class="screen" id="screen-profile">
+    <div class="section-title">Your Guild Card</div>
+    <div class="guild-card">
+      <div class="gc-top">
+        <div>
+          <div class="gc-brand">SHINE GUILD CARD</div>
+          <div class="gc-name" id="profGcName">Guild Member</div>
+          <div class="gc-meta">98840 ••••51 &nbsp;·&nbsp; Adyar, Chennai</div>
+        </div>
+        <div class="gc-rank" id="profRank">New</div>
+      </div>
+      <div class="gc-bottom">
+        <div class="gc-verified">🛡️ Fully Verified</div>
+        <div style="font-size:22px">✨</div>
+      </div>
+    </div>
+    <div style="font-size:12px;color:var(--text-faint);display:flex;justify-content:space-between;">
+      <span>Rank progress</span><span id="profXp">0 / 400 XP to Rank B</span>
+    </div>
+    <div class="rank-bar"><div class="rank-fill" id="rankFill" style="width:0%"></div></div>
+
+    <div class="stat-grid">
+      <div class="stat-box"><div class="n" id="statRating">—</div><div class="l">⭐ RATING</div></div>
+      <div class="stat-box"><div class="n" id="statQuests">0</div><div class="l">QUESTS DONE</div></div>
+      <div class="stat-box"><div class="n" id="statNoShows">0</div><div class="l">NO-SHOWS</div></div>
+    </div>
+
+    <div class="section-title" style="font-size:15px">Recent Reviews</div>
+    <div id="reviewsList">
+      <div class="section-sub" id="noReviewsNote" style="text-align:center;padding:14px 0">No reviews yet — they'll show up here once you complete your first quest.</div>
+    </div>
+  </div>
+
+  <!-- ================= SUPPORT ================= -->
+  <div class="screen" id="screen-support">
+    <div class="section-title">Guild Support</div>
+    <div class="section-sub">Raise an issue between you and the other party — reviewed by the Guild Council.</div>
+
+    <div class="qcard" style="margin-bottom:16px">
+      <div class="qcard-title">Dispute #GC-2291</div>
+      <div class="qcard-loc">Quest: Watch house while abroad</div>
+      <div class="dispute-timeline">
+        <div class="dt-node"><div class="dt-dot on">1</div><span>Filed</span></div>
+        <div class="dt-node"><div class="dt-dot on">2</div><span>Evidence<br>Requested</span></div>
+        <div class="dt-node"><div class="dt-dot on">3</div><span>Council<br>Review</span></div>
+        <div class="dt-node"><div class="dt-dot">4</div><span>Resolved</span></div>
+      </div>
+      <div class="warn-box" style="margin-bottom:0"><b>Escrow held.</b> The ₹600 reward stays locked until the Council rules — neither side is paid or refunded until then.</div>
+    </div>
+
+    <div style="max-height:220px;overflow-y:auto;margin-bottom:14px;">
+      <div class="msg them">Client: The check-in photo doesn't clearly show the front gate.</div>
+      <div class="msg me">Worker: I've attached the full 6-photo walkthrough + timestamped video from check-in.</div>
+      <div class="msg them">Guild Council: Reviewing submitted evidence — reply within 24h.</div>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <input placeholder="Type a message…" style="flex:1;background:var(--ink-raised);border:1px solid var(--ink-line);border-radius:12px;padding:12px;color:var(--text)">
+      <button class="btn btn-gold btn-sm" onclick="toast('Message sent to Guild Council')">Send</button>
+    </div>
+    <button class="btn btn-ghost" style="width:100%;margin-top:14px" onclick="toast('New dispute form opened')">＋ Open a New Dispute</button>
+<button class="btn btn-ghost" style="width:100%;margin-top:10px" onclick="openDisputeInfo()">⚖️ How Shine resolves disputes</button>
+
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <div class="bottomnav" id="bottomnav">
+    <button class="navbtn active" data-nav="board" onclick="go('board')"><span class="ic">📜</span>Board</button>
+    <button class="navbtn" id="navPost" data-nav="post" onclick="setRole('client')"><span class="ic">🖋️</span>Post</button>
+    <button class="navbtn" data-nav="active" onclick="go('active')"><span class="ic">🧭</span>Active</button>
+    <button class="navbtn" data-nav="profile" onclick="go('profile')"><span class="ic">🪪</span>Profile</button>
+    <button class="navbtn" data-nav="support" onclick="go('support')"><span class="ic">🛎️</span>Support</button>
+  </div>
+</div>
+
+<!-- ================= SHEET: QUEST DETAIL ================= -->
+<div class="overlay" id="sheet-detail">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div id="detailBody"></div>
+  </div>
+</div>
+
+<!-- ================= SHEET: CHECK-IN SCAN ================= -->
+<div class="overlay" id="sheet-checkin">
+  <div class="sheet" style="text-align:center">
+    <div class="sheet-handle"></div>
+    <h3 style="font-family:'Cinzel',serif;color:var(--gold-soft);margin-bottom:6px;">On-Site Verification</h3>
+    <p style="color:var(--text-dim);font-size:13px;margin-bottom:16px">Confirm you're really at the quest location before starting the clock.</p>
+    <div class="scan-ring" id="checkinRing"><span>🖐️</span><div class="scan-line"></div></div>
+    <button class="btn btn-sage" style="width:100%" onclick="runScan('checkinRing','', 'Checked in — you are on site')" id="checkinBtn">Scan Fingerprint to Check In</button>
+    <button class="btn btn-ghost" style="width:100%;margin-top:10px" onclick="closeSheet('sheet-checkin')">Not yet</button>
+  </div>
+</div>
+
+<!-- ================= SHEET: CANCEL / PENALTY ================= -->
+<div class="overlay" id="sheet-cancel">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <h3 style="font-family:'Cinzel',serif;color:var(--coral);margin-bottom:10px;">Cancel this quest?</h3>
+    <div class="warn-box">
+      <b>Leaving after accepting has a cost.</b><br>
+      • No evidence of arrival yet → a ₹150 no-show fee is charged to you, paid to the client as apology, and the quest is instantly reissued to the next nearby worker.<br><br>
+      • Already checked in on-site → you must file a reason with proof (emergency, unsafe conditions, etc.) for Guild Council review before any fee is waived.
+    </div>
+    <button class="btn btn-coral" style="width:100%;margin-bottom:10px" onclick="cancelQuest()">Confirm Cancel (₹150 fee)</button>
+    <button class="btn btn-ghost" style="width:100%" onclick="closeSheet('sheet-cancel')">Keep the Quest</button>
+  </div>
+</div>
+
+<!-- ================= SHEET: RATE WORKER ================= -->
+<div class="overlay" id="sheet-rate">
+  <div class="sheet" style="text-align:center">
+    <div class="sheet-handle"></div>
+    <div class="payout">
+      <div class="amt" id="rateAmt">₹600</div>
+      <div class="lbl">RELEASED FROM ESCROW TO YOU</div>
+    </div>
+    <h3 style="font-family:'Cinzel',serif;color:var(--gold-soft);margin-bottom:4px;">Rate the Client</h3>
+    <p style="color:var(--text-dim);font-size:13px;margin-bottom:4px" id="rateSubtitle">How was working with the client?</p>
+    <div class="star-picker" id="starPicker">
+      <span onclick="setStars(1)">★</span><span onclick="setStars(2)">★</span><span onclick="setStars(3)">★</span><span onclick="setStars(4)">★</span><span onclick="setStars(5)">★</span>
+    </div>
+    <div class="tag-row">
+      <div class="tag" onclick="this.classList.toggle('sel')">Punctual</div>
+      <div class="tag" onclick="this.classList.toggle('sel')">Great Communication</div>
+      <div class="tag" onclick="this.classList.toggle('sel')">Followed Instructions</div>
+      <div class="tag" onclick="this.classList.toggle('sel')">Went Above &amp; Beyond</div>
+    </div>
+    <button class="btn btn-gold" style="width:100%" onclick="submitRating()">Submit Rating</button>
+  </div>
+</div>
+
+
+<!-- ===== CAMERA / ID / FINGERPRINT MODULE ===== -->
+<div class="camera-modal" id="cameraModal">
+  <div class="camera-card">
+    <div class="camera-head">
+      <h3 id="cameraTitle">Face Capture</h3>
+      <button class="camera-close" onclick="closeCamera()">×</button>
+    </div>
+    <div class="camera-frame" id="cameraFrame">
+      <video id="cameraVideo" autoplay playsinline muted></video>
+      <div class="camera-guide" id="cameraGuide"></div>
+      <div class="camera-hint" id="cameraHint">Allow camera access, center your face, then capture.</div>
+    </div>
+    <img class="capture-preview" id="capturePreview">
+    <div class="camera-actions">
+      <button class="btn btn-ghost" onclick="closeCamera()">Cancel</button>
+      <button class="btn btn-gold" id="captureBtn" onclick="captureCamera()">📸 Capture</button>
+    </div>
+  </div>
+</div>
+
+<div class="camera-modal" id="fingerModal">
+  <div class="camera-card">
+    <div class="camera-head">
+      <h3>Fingerprint Check</h3>
+      <button class="camera-close" onclick="closeFinger()">×</button>
+    </div>
+    <div class="scan-pad" id="fingerPad">
+      <div class="finger-icon">☝️</div>
+      <div class="finger-wave"></div>
+    </div>
+    <p style="text-align:center;color:#748096;font-size:12px;margin:12px 0">Hold your finger on the scanner area.</p>
+    <button class="btn btn-sage" style="width:100%" onclick="captureFingerprint()">Scan Fingerprint</button>
+  </div>
+</div>
+
+
+<!-- ===== SHINE ID + BIOMETRIC CAPTURE MODULE ===== -->
+<div class="identity-modal" id="identityModal">
+  <div class="identity-card">
+    <div class="identity-head">
+      <h3 id="identityTitle">Identity Verification</h3>
+      <button class="identity-close" onclick="closeIdentityModule()">×</button>
+    </div>
+
+    <div class="identity-tabs">
+      <button class="identity-tab active" id="tabId" onclick="switchIdentityMode('id')">🪪 ID CAMERA</button>
+      <button class="identity-tab" id="tabFinger" onclick="switchIdentityMode('finger')">☝️ BIOMETRIC</button>
+    </div>
+
+    <div id="idCapturePanel">
+      <div class="id-camera-box">
+        <video id="idCameraVideo" autoplay playsinline muted></video>
+        <div class="id-guide"></div>
+        <div class="camera-status" id="idCameraStatus">
+          Place Aadhaar / national ID / passport inside the frame.
+        </div>
+      </div>
+      <img id="idPreview" class="id-preview">
+      <div class="identity-actions">
+        <button class="btn btn-ghost" onclick="closeIdentityModule()">Cancel</button>
+        <button class="btn btn-gold" onclick="captureIdentityID()">📸 Capture ID</button>
+      </div>
+      <div class="bio-note">
+        Prototype: the camera captures the document image. A production SHINE backend should
+        OCR the document, validate its authenticity, encrypt it, and verify the identity with an
+        approved government/KYC provider.
+      </div>
+    </div>
+
+    <div id="fingerCapturePanel" style="display:none">
+      <div class="fingerprint-box" id="fingerprintBox">
+        <svg class="fingerprint-svg" viewBox="0 0 120 150" fill="none">
+          <path d="M60 9C31 9 13 31 13 59c0 15 5 28 11 38M60 22C39 22 25 38 25 59c0 14 4 25 10 35M60 35c-14 0-23 10-23 24 0 14 7 25 14 33M60 48c-7 0-12 5-12 12 0 16 12 22 12 42M72 17c17 5 28 20 28 42 0 18-6 33-14 44M60 9c29 0 47 22 47 50 0 19-5 35-13 47M84 35c7 8 11 18 11 31 0 15-4 27-10 39M72 48c8 6 12 14 12 25 0 12-3 21-8 30" stroke="#6555D6" stroke-width="3.5" stroke-linecap="round"/>
+        </svg>
+        <div class="fingerprint-scanline"></div>
+      </div>
+      <div class="identity-actions">
+        <button class="btn btn-ghost" onclick="closeIdentityModule()">Cancel</button>
+        <button class="btn btn-sage" onclick="startBiometricVerification()">☝️ Scan Fingerprint</button>
+      </div>
+      <div class="bio-note">
+        Browser camera cannot read a physical fingerprint. This module is the visual biometric
+        flow; production SHINE should use the device's secure biometric API / WebAuthn or a
+        certified fingerprint reader rather than storing raw fingerprints.
+      </div>
+    </div>
+
+    <div class="identity-success" id="identitySuccess">
+      <div class="success-icon">🛡️</div>
+      <h4>Identity Verified</h4>
+      <p id="identitySuccessText">Your verification step was completed successfully.</p>
+    </div>
+  </div>
+</div>
+
+
+<div class="overlay" id="quickPanel">
+  <div class="sheet quick-sheet">
+    <div class="sheet-handle"></div>
+    <div id="quickPanelBody"></div>
+    <button class="btn btn-ghost" style="width:100%;margin-top:14px" onclick="closeSheet('quickPanel')">Close</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+<input id="faceFallbackInput" type="file" accept="image/*" capture="user" style="display:none">
+<input id="idFallbackInput" type="file" accept="image/*" capture="environment" style="display:none">
+<input id="evidenceFallbackInput" type="file" accept="image/*,video/*" capture="environment" multiple style="display:none">
+
+<script>
+/* ================= STATE ================= */
+let role = 'worker';
+let currentFilter = 'all';
+let stars = 0;
+// Urgency is the client's own call when they post a quest — it directly
+// sets the quest's S/A/B rank badge, which previously was just baked into
+// the demo data and never something a client actually chose.
+let selectedUrgency = 'S';
+function setUrgency(tier, el){
+  selectedUrgency = tier;
+  document.querySelectorAll('.urgency-tag').forEach(t=> t.classList.remove('sel'));
+  el.classList.add('sel');
+  const notes = {
+    S: 'Urgent quests are marked S RANK and shown first on the board — workers see the most urgent requests before anything else.',
+    A: 'Marked A RANK — noticeably prioritized, but not pushed to the very top like an urgent request.',
+    B: 'Marked B RANK — a normal, flexible request with no time pressure on workers.'
+  };
+  const note = document.getElementById('urgencyNote');
+  if(note) note.textContent = notes[tier] || '';
+}
+let activeQuest = null;
+
+/* ================= REAL MAPS (geolocation + Google Maps embed) =================
+   Uses the keyless google.com/maps ...&output=embed endpoint, so it needs no
+   API key — it works because the file runs in the user's own browser with
+   their own internet access. Iframes start "locked" (pointer-events:none) so
+   scrolling the page past a map scrolls the page, not the map; one tap
+   un-locks it for real pan/zoom. */
+let userLat = null, userLng = null;
+let manualLocationText = null;
+const CHENNAI_FALLBACK = {lat:13.0827, lng:80.2707};
+
+function initRealMaps(){
+  const settle = (lat,lng)=>{
+    userLat = lat; userLng = lng;
+    mountNearbyMap();
+    if(activeQuest) mountActiveMap();
+  };
+  // Chrome (and most browsers) refuse real Geolocation on file:// pages —
+  // it's treated as an insecure origin, so this will fail immediately with
+  // "denied" every single time no matter what you click in any OS-level
+  // permission prompt, even if you'd normally allow it. That's a browser
+  // platform rule, not something fixable from inside this file — it works
+  // automatically once this is served over http/https instead of opened
+  // as a local file. Until then, the ✎ button on the map lets you type
+  // your area manually so the map is still genuinely centered on you.
+  if(navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(
+      pos => settle(pos.coords.latitude, pos.coords.longitude),
+      ()  => { toast('📍 Location blocked (normal for a local file) — tap ✎ on the map to set your area'); settle(CHENNAI_FALLBACK.lat, CHENNAI_FALLBACK.lng); },
+      {timeout:6000}
+    );
+  } else {
+    settle(CHENNAI_FALLBACK.lat, CHENNAI_FALLBACK.lng);
+  }
+}
+
+function mapTapWrapHTML(id, src, withLocate){
+  return `<iframe class="real-map-frame locked" id="${id}" src="${src}" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+    <div class="map-tap-hint" onclick="unlockMap('${id}', this)"><span>👆 Tap to explore map</span></div>
+    ${withLocate ? `<button class="map-locate-btn" onclick="event.stopPropagation();promptManualLocation()" title="Set your area">✎</button>` : ''}`;
+}
+function unlockMap(id, hintEl){
+  const frame = document.getElementById(id);
+  if(frame) frame.classList.remove('locked');
+  if(hintEl) hintEl.classList.add('gone');
+}
+
+// Lets a person type their actual area/locality when real geolocation isn't
+// available (e.g. every time this runs as a local file) — the map then
+// centers on whatever they typed instead of silently sitting on a Chennai
+// default with no way to change it.
+function promptManualLocation(){
+  const val = window.prompt('Set your area (e.g. "Adyar, Chennai" or a full address):', manualLocationText || '');
+  if(val && val.trim()){
+    manualLocationText = val.trim();
+    mountNearbyMap();
+    if(activeQuest) mountActiveMap();
+    toast('📍 Map centered on "' + manualLocationText + '"');
+  }
+}
+
+function mountNearbyMap(){
+  const box = document.getElementById('nearbyMapBox');
+  if(!box) return;
+  box.classList.add('real-map');
+  const src = manualLocationText
+    ? `https://www.google.com/maps?q=${encodeURIComponent(manualLocationText)}&z=13&output=embed`
+    : `https://www.google.com/maps?q=${userLat},${userLng}&z=14&output=embed`;
+  box.innerHTML = mapTapWrapHTML('nearbyMapFrame', src, true);
+}
+
+function mountActiveMap(){
+  const box = document.getElementById('activeMapBox');
+  if(!box || !activeQuest) return;
+  box.classList.add('real-map');
+  const dest = encodeURIComponent(activeQuest.addr);
+  const origin = manualLocationText ? encodeURIComponent(manualLocationText) : (userLat!=null ? `${userLat},${userLng}` : null);
+  const src = origin
+    ? `https://www.google.com/maps?saddr=${origin}&daddr=${dest}&output=embed`
+    : `https://www.google.com/maps?q=${dest}&output=embed`;
+  box.innerHTML = mapTapWrapHTML('activeMapFrame', src, true);
+}
+
+/* ================= IDENTITY / AUTH STATE ================= */
+let isVerified = false;          // becomes true only once face + ID + fingerprint are all done
+let userName = '';                // captured from the name field during the ID step
+let userInitials = '?';
+const PROTECTED_SCREENS = ['board','post','active','profile','support'];
+
+function setUserName(name){
+  userName = name;
+  userInitials = name.split(/\s+/).filter(Boolean).slice(0,2).map(w=>w[0].toUpperCase()).join('') || '?';
+  updateIdentityDisplays();
+}
+
+function updateIdentityDisplays(){
+  const display = userName || 'Guild Member';
+  // Guild Card reveal screen
+  const gcName = document.getElementById('gcName');
+  if(gcName) gcName.textContent = display;
+  // Profile screen guild card
+  const profGcName = document.getElementById('profGcName');
+  if(profGcName) profGcName.textContent = display;
+  // Topbar profile pill
+  const pillName = document.getElementById('pillName');
+  if(pillName) pillName.textContent = display;
+  const pillAvatar = document.getElementById('pillAvatar');
+  if(pillAvatar) pillAvatar.textContent = userInitials;
+}
+
+function markVerified(){
+  isVerified = true;
+}
+
+const quests = [
+  {id:1, cat:'home', icon:'🏠', color:'#FBEFD9', title:'Watch my house while I\'m abroad', desc:'Check doors/windows locked, water the plants, collect mail. Once daily for 10 days. Send 3 photos each visit.', addr:'14 Lattice Bridge Rd, Adyar, Chennai', tier:'A', reward:600, slots:1, total:1, client:{name:'Meera P.', rating:4.8, phone:'+91 98840 xxxxx', addr:'Adyar, Chennai'}},
+  {id:2, cat:'tech', icon:'🔧', color:'#ECE7FB', title:'Supervise plumber for 2 hours', desc:'Plumber arrives 3pm to fix a leak. Need someone trusted to let them in, watch the work, and lock up after.', addr:'22 Kasturba Nagar, Adyar, Chennai', tier:'B', reward:400, slots:1, total:1, client:{name:'Raghav S.', rating:4.6, phone:'+91 90031 xxxxx', addr:'Kasturba Nagar, Chennai'}},
+  {id:3, cat:'elder', icon:'👴', color:'#E1F3EA', title:'Take my father to hospital check-up', desc:'Escort to Apollo Hospital, wait through the general check-up, help him back home. Roughly 3 hours.', addr:'Apollo Hospitals, Greams Rd, Chennai', tier:'S', reward:900, slots:2, total:2, client:{name:'Divya K.', rating:5.0, phone:'+91 99400 xxxxx', addr:'T. Nagar, Chennai'}},
+  {id:4, cat:'child', icon:'🧒', color:'#FBE6EF', title:'Urgent — pick up my daughter from school', desc:'I\'m stuck at work. Need someone verified to collect her at 3:30pm from the gate and stay with her till I arrive by 6pm.', addr:'DAV School, Gopalapuram, Chennai', tier:'S', reward:750, slots:1, total:1, client:{name:'Arvind N.', rating:4.9, phone:'+91 63801 xxxxx', addr:'Gopalapuram, Chennai'}},
+  {id:5, cat:'company', icon:'💬', color:'#FCEAE4', title:'Spend the evening with my grandmother', desc:'She\'s alone most evenings. Just company — tea, conversation, maybe a walk. 2 hours, twice a week.', addr:'8 Kutchery Rd, Mylapore, Chennai', tier:'B', reward:350, slots:1, total:1, client:{name:'Priya V.', rating:4.7, phone:'+91 94440 xxxxx', addr:'Mylapore, Chennai'}},
+];
+
+const categories = [
+  {k:'home', ic:'🏠', l:'Home Watch'},
+  {k:'tech', ic:'🔧', l:'Supervise'},
+  {k:'elder', ic:'👴', l:'Elder Escort'},
+  {k:'child', ic:'🧒', l:'Child Pickup'},
+  {k:'company', ic:'💬', l:'Company'},
+  {k:'errand', ic:'📦', l:'Errand'},
+  {k:'other', ic:'✨', l:'Other'},
+];
+
+/* ================= NAV ================= */
+function go(name){
+  // Hard gate: the Guild Hall (board/post/active/profile/support) is only reachable
+  // once face + ID + fingerprint verification has actually completed. This blocks
+  // every entry point at once — bottom nav, sidebar, buttons, even a stray go() call —
+  // instead of only hiding one button.
+  if(PROTECTED_SCREENS.includes(name) && !isVerified){
+    toast('🔒 Verify your identity first to enter the Guild Hall');
+    if(!document.getElementById('screen-login').classList.contains('active') &&
+       !document.querySelector('.screen[id^="screen-verify"].active')){
+      // Not already somewhere in the verification flow — send them to start it.
+      name = 'login';
+    } else {
+      return; // stay put on whatever verification step they're on
+    }
+  }
+
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const el = document.getElementById('screen-'+name);
+  if(el) el.classList.add('active');
+  document.querySelectorAll('.navbtn').forEach(b=>b.classList.toggle('active', b.dataset.nav===name));
+  document.querySelectorAll('.side-item[data-nav]').forEach(b=>b.classList.toggle('active', b.dataset.nav===name));
+
+  const showChrome = isVerified && !['login'].includes(name) && !name.startsWith('verify');
+  // A later CSS pass added `!important` rules that force the sidebar visible on
+  // desktop widths and the bottom nav visible on mobile widths, no matter what —
+  // that silently overrode this gate (a plain inline style loses to a stylesheet
+  // !important rule). When blocking access we now set our own !important inline
+  // override, which always wins; when access is allowed we clear the inline
+  // style entirely so the normal responsive (sidebar-on-desktop / navbar-on-
+  // mobile) rules take back over as designed.
+  const topbarEl = document.getElementById('topbar');
+  const bottomnavEl = document.getElementById('bottomnav');
+  const sidebar = document.getElementById('shineSidebar');
+  [topbarEl, bottomnavEl, sidebar].forEach(el=>{
+    if(!el) return;
+    if(showChrome) el.style.removeProperty('display');
+    else el.style.setProperty('display', 'none', 'important');
+  });
+  window.scrollTo(0,0);
+}
+
+function setRole(r){
+  role = r;
+  document.getElementById('btnWorker').classList.toggle('active', r==='worker');
+  document.getElementById('btnClient').classList.toggle('active', r==='client');
+  go(r==='client' ? 'post' : 'board');
+}
+
+function loginExisting(){
+  // Returning members still confirm it's really them with a fingerprint check
+  // before the app lets them in — no path into the Guild Hall skips verification.
+  toast('Confirm it\'s you to sign in');
+  openIdentityModule('finger','login');
+}
+
+/* ================= VERIFICATION ================= */
+function runScan(ringId, nextScreen, msg){
+  const ring = document.getElementById(ringId);
+  ring.classList.remove('locked');
+  setTimeout(()=>{
+    ring.classList.add('locked');
+    ring.querySelector('span').textContent = '✅';
+    toast(msg);
+    if(nextScreen) setTimeout(()=>go(nextScreen), 500);
+    else setTimeout(()=>{ closeSheet('sheet-checkin'); startWork(); }, 500);
+  }, 1600);
+}
+/* Step 2 (ID) is only ready to continue once BOTH a name has been typed
+   AND the ID has actually been scanned (idUpload carries the .filled class
+   once captureIdentityID() runs). */
+let idScanned = false;
+function checkVerify2Ready(){
+  const name = (document.getElementById('nameInput')||{}).value || '';
+  const btn = document.getElementById('idNextBtn');
+  const hint = document.getElementById('verify2Hint');
+  const ready = name.trim().length > 1 && idScanned;
+  if(btn) btn.disabled = !ready;
+  if(hint){
+    hint.textContent = ready
+      ? 'Looks good — tap Continue'
+      : (!name.trim() ? 'Enter your name and scan your ID to continue' : 'Now scan your ID to continue');
+  }
+}
+function confirmVerify2(){
+  const name = (document.getElementById('nameInput')||{}).value.trim();
+  if(!name){ toast('Enter your full name first'); return; }
+  setUserName(name);
+  go('verify3');
+}
+
+/* ================= QUEST BOARD ================= */
+function renderQuests(){
+  const list = document.getElementById('questList');
+  list.innerHTML = '';
+  // Completed quests are done — they no longer belong on the board at all,
+  // not even as a greyed-out "Quest Full" card.
+  const TIER_ORDER = {S:0, A:1, B:2};
+  const filtered = quests
+    .filter(q=> !q.completed && (currentFilter==='all' || q.cat===currentFilter))
+    .sort((a,b)=> (TIER_ORDER[a.tier] ?? 3) - (TIER_ORDER[b.tier] ?? 3));
+  filtered.forEach(q=>{
+    const filled = q.total - q.slots;
+    const pct = Math.round((filled/q.total)*100);
+    const full = q.slots<=0;
+    const card = document.createElement('div');
+    card.className='qcard';
+    card.innerHTML = `
+      <div class="tier tier-${q.tier}">${q.tier} RANK</div>
+      <div class="qcard-top">
+        <div class="qicon" style="background:${q.color}">${q.icon}</div>
+        <div class="qcard-body">
+          <div class="qcard-title">${q.title}</div>
+          <div class="qcard-loc">📍 ${q.addr}</div>
+        </div>
+      </div>
+      <div class="qcard-desc">${q.desc}</div>
+      <div class="qcard-foot">
+        <div class="reward">₹${q.reward}</div>
+        <div class="slots">👥 Need ${q.total} worker${q.total>1?'s':''} · ${filled}/${q.total} filled <div class="slots-bar"><div class="slots-fill" style="width:${pct}%"></div></div></div>
+      </div>
+      <button class="btn ${full?'btn-ghost':'btn-gold'} viewbtn" ${full?'disabled':''} onclick="openDetail(${q.id})">${full? 'Quest Full' : 'View Quest'}</button>
+    `;
+    list.appendChild(card);
+  });
+  if(filtered.length===0){
+    list.innerHTML = '<div class="section-sub" style="text-align:center;margin-top:30px">No quests posted in this category yet.</div>';
+  }
+}
+function filterQ(el, cat){
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  currentFilter = cat;
+  renderQuests();
+}
+
+/* ================= QUEST DETAIL / ACCEPT ================= */
+function openDetail(id){
+  const q = quests.find(x=>x.id===id);
+  const filled = q.total - q.slots;
+  const full = q.slots<=0;
+  document.getElementById('detailBody').innerHTML = `
+    <div class="qicon" style="background:${q.color};width:64px;height:64px;font-size:34px;border-radius:18px;margin-bottom:10px;">${q.icon}</div>
+    <h2 style="font-family:'Cinzel',serif;font-size:19px;color:var(--gold-soft);margin-bottom:8px;">${q.title}</h2>
+    <p style="color:var(--text-dim);font-size:13.5px;line-height:1.5;margin-bottom:12px;">${q.desc}</p>
+    <div class="row-info"><span>📍 Location</span><span style="text-align:right;max-width:60%">${q.addr}</span></div>
+    <div class="row-info"><span>💰 Reward (escrowed)</span><span style="color:var(--sage);font-weight:700">₹${q.reward}</span></div>
+    <div class="row-info"><span>👥 Slots</span><span>${filled}/${q.total} filled</span></div>
+    <div class="row-info"><span>🏵️ Guild Tier</span><span>${q.tier} Rank</span></div>
+    <div class="person-card">
+      <div class="avatar">${q.client.name.split(' ').map(w=>w[0]).join('')}</div>
+      <div style="flex:1">
+        <div class="person-name">${q.client.name} <span style="color:var(--sage);font-size:11px">🛡️ Verified</span></div>
+        <div class="stars">★★★★★ <span style="color:var(--text-faint);font-weight:400">${q.client.rating}</span></div>
+        <div class="person-sub">${q.client.phone} · ${q.client.addr}</div>
+      </div>
+    </div>
+    <button class="btn ${full?'btn-ghost':'btn-gold'}" style="width:100%" ${full?'disabled':''} onclick="acceptQuest(${q.id})">${full?'Quest Full':'⚔️ Accept Quest'}</button>
+    <div class="center-note">Slots are locked with an atomic reservation — two workers can never fill the same slot, even if 1,000 people tap Accept at once.</div>
+  `;
+  openSheet('sheet-detail');
+}
+
+function acceptQuest(id){
+  const q = quests.find(x=>x.id===id);
+  if(q.slots<=0){ toast('Too slow — quest just filled up'); closeSheet('sheet-detail'); renderQuests(); return; }
+  // Simulated atomic decrement (in production: single conditional DB write, e.g. UPDATE quests SET slots=slots-1 WHERE id=? AND slots>0)
+  q.slots -= 1;
+  activeQuest = q;
+  closeSheet('sheet-detail');
+  toast('Quest secured! ' + (q.slots) + ' slot(s) left');
+  renderQuests();
+  renderActive();
+  setTimeout(()=>go('active'), 400);
+}
+
+/* ================= POST QUEST (CLIENT) ================= */
+let selectedCat = 'home';
+let qty = 1;
+function renderCatGrid(){
+  const grid = document.getElementById('catGrid');
+  grid.innerHTML = categories.map(c=>`
+    <div class="icon-pick ${c.k===selectedCat?'sel':''}" onclick="pickCat('${c.k}')">
+      <span>${c.ic}</span><span class="lbl">${c.l}</span>
+    </div>`).join('');
+}
+function pickCat(k){ selectedCat=k; renderCatGrid(); }
+function stepQty(d){ qty = Math.max(1, Math.min(9, qty+d)); document.getElementById('qtyVal').textContent = qty; }
+function postQuest(){
+  const title = document.getElementById('pTitle').value || 'New quest';
+  toast('🔏 Verifying your identity…');
+  setTimeout(()=>{
+    toast('✅ Quest posted to nearby verified workers');
+    go('board');
+  }, 1200);
+}
+
+/* ================= ACTIVE QUEST ================= */
+function renderActive(){
+  const box = document.getElementById('activeCardBox');
+  const details = document.getElementById('activeQuestDetails');
+  if(!activeQuest){
+    box.innerHTML = `
+      <div style="text-align:center;padding:22px 8px">
+        <div style="font-size:38px;margin-bottom:8px">🧭</div>
+        <div style="font-weight:800;font-size:15px;margin-bottom:6px">No active quest yet</div>
+        <div class="section-sub" style="margin-bottom:16px">Accept a quest from the Board and its location, timeline and check-in will all show up here.</div>
+        <button class="btn btn-gold" style="width:100%" onclick="go('board')">📜 Browse the Quest Board</button>
+      </div>`;
+    if(details) details.style.display = 'none';
+    document.getElementById('checkinBox').innerHTML='';
+    document.getElementById('evidenceBox').innerHTML='';
+    document.getElementById('questTimeline').innerHTML='';
+    return;
+  }
+  if(details) details.style.display = '';
+  mountActiveMap();
+  const q = activeQuest;
+  box.innerHTML = `
+    <div class="qcard-top">
+      <div class="qicon" style="background:${q.color}">${q.icon}</div>
+      <div class="qcard-body">
+        <div class="qcard-title">${q.title}</div>
+        <div class="qcard-loc">📍 ${q.addr}</div>
+      </div>
+    </div>
+    <div class="qcard-foot" style="margin-top:10px">
+      <div class="reward">₹${q.reward} escrowed</div>
+      <div class="slots">Client: ${q.client.name} · ${q.client.phone}</div>
+    </div>
+  `;
+  renderTimeline('accepted');
+  document.getElementById('checkinBox').innerHTML = `<button class="btn btn-gold" style="width:100%;margin-bottom:14px" onclick="openOnSiteFingerprint()">☝️ Verify Identity & Check In</button>`;
+  document.getElementById('evidenceBox').innerHTML = '';
+}
+
+function renderTimeline(stage){
+  const stages = [
+    {k:'accepted', ic:'⚔️', h:'Quest accepted', p:'Reward held safely in escrow'},
+    {k:'checkin', ic:'🖐️', h:'On-site check-in', p:'Fingerprint confirms you have arrived'},
+    {k:'work', ic:'🛠️', h:'Work in progress', p:'Follow the client\'s instructions'},
+    {k:'evidence', ic:'📸', h:'Evidence submitted', p:'Photos/notes sent for client review'},
+    {k:'paid', ic:'💰', h:'Payment released', p:'Client approved — funds sent to you'},
+  ];
+  const order = ['accepted','checkin','work','evidence','paid'];
+  const idx = order.indexOf(stage);
+  document.getElementById('questTimeline').innerHTML = stages.map((s,i)=>`
+    <div class="tstep">
+      <div class="tdot ${i<idx?'done':(i===idx?'now':'')}">${i<idx?'✓':s.ic}</div>
+      <div><h4>${s.h}</h4><p>${s.p}</p></div>
+    </div>`).join('');
+}
+
+function navigateToQuest(){
+  if(!activeQuest){ toast('Accept a quest first'); return; }
+  const url = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(activeQuest.addr);
+  window.open(url, '_blank');
+}
+
+function startWork(){
+  renderTimeline('work');
+  toast('You are checked in — clock started');
+  document.getElementById('checkinBox').innerHTML = `<div class="status-chip">🖐️ Checked in at location</div>`;
+  document.getElementById('evidenceBox').innerHTML = `
+    <div class="section-title" style="font-size:15px;margin-top:6px">Submit Evidence</div>
+    <div class="evidence-drop" id="evDrop" onclick="fillEvidence()">📷 Tap to attach photos / short video of completed work</div>
+    <textarea id="evNote" placeholder="Quick note for the client…" style="width:100%;background:var(--ink-raised);border:1px solid var(--ink-line);border-radius:12px;padding:12px;color:var(--text);min-height:60px;margin-bottom:12px;"></textarea>
+    <button class="btn btn-gold" style="width:100%" onclick="submitEvidence()">Submit for Client Approval</button>
+  `;
+}
+function fillEvidence(){
+  const d = document.getElementById('evDrop');
+  d.classList.add('filled');
+  d.innerHTML = '✅ 3 photos + 1 video attached, timestamped &amp; geo-tagged';
+}
+function submitEvidence(){
+  renderTimeline('evidence');
+  toast('Evidence sent — waiting on client approval');
+  setTimeout(()=>{
+    renderTimeline('paid');
+    populateRatingSheet();
+    openSheet('sheet-rate');
+  }, 1500);
+}
+
+/* ================= WORKER STATS (real, starts at zero) =================
+   Previously these were hardcoded demo numbers (4.9 / 37 quests / 640 XP)
+   that never moved no matter what you did. Now everything starts at zero
+   the moment you log in and only changes because of things you actually
+   do in this session: complete a quest, get a review, cancel/no-show. */
+let workerStats = { questsDone:0, noShows:0, xp:0, ratingSum:0, ratingCount:0 };
+let recentReviews = [];
+const RANK_TIERS = [
+  {label:'New', min:0},
+  {label:'B',   min:400},
+  {label:'A',   min:1000},
+  {label:'S',   min:2500},
+];
+function rankForXp(xp){
+  let cur = RANK_TIERS[0];
+  for(const t of RANK_TIERS){ if(xp>=t.min) cur=t; }
+  return cur;
+}
+function nextRankForXp(xp){
+  for(const t of RANK_TIERS){ if(xp<t.min) return t; }
+  return null;
+}
+// A little variety for the simulated client-side review this prototype
+// generates when you complete a quest — there's no second live user to
+// actually type one, so this stands in for "the client also rated you".
+const REVIEW_LINES = [
+  "Reliable and exactly on time — would call again.",
+  "Great communication throughout, sent clear updates.",
+  "Handled everything carefully, followed every instruction.",
+  "Went beyond what was asked — really appreciated it.",
+  "Calm, professional, and easy to coordinate with."
+];
+function renderProfileStats(){
+  const avg = workerStats.ratingCount ? (workerStats.ratingSum/workerStats.ratingCount).toFixed(1) : '—';
+  const cur = rankForXp(workerStats.xp);
+  const nxt = nextRankForXp(workerStats.xp);
+  const statRating = document.getElementById('statRating');
+  const statQuests = document.getElementById('statQuests');
+  const statNoShows = document.getElementById('statNoShows');
+  const profRank = document.getElementById('profRank');
+  const profXp = document.getElementById('profXp');
+  const rankFill = document.getElementById('rankFill');
+  if(statRating) statRating.textContent = avg;
+  if(statQuests) statQuests.textContent = workerStats.questsDone;
+  if(statNoShows) statNoShows.textContent = workerStats.noShows;
+  if(profRank) profRank.textContent = cur.label;
+  if(nxt){
+    if(profXp) profXp.textContent = `${workerStats.xp} / ${nxt.min} XP to Rank ${nxt.label}`;
+    if(rankFill) rankFill.style.width = Math.min(100, (workerStats.xp/nxt.min*100)) + '%';
+  } else {
+    if(profXp) profXp.textContent = `${workerStats.xp} XP — top rank reached`;
+    if(rankFill) rankFill.style.width = '100%';
+  }
+  const list = document.getElementById('reviewsList');
+  if(list){
+    if(recentReviews.length === 0){
+      list.innerHTML = `<div class="section-sub" id="noReviewsNote" style="text-align:center;padding:14px 0">No reviews yet — they'll show up here once you complete your first quest.</div>`;
+    } else {
+      list.innerHTML = recentReviews.slice().reverse().map(r => `
+        <div class="person-card">
+          <div class="avatar">${r.initials}</div>
+          <div style="flex:1">
+            <div class="person-name">${r.name}</div>
+            <div class="stars">${'★'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</div>
+            <div class="person-sub">"${r.text}"</div>
+          </div>
+        </div>`).join('');
+    }
+  }
+}
+function recordCompletedQuest(){
+  if(!activeQuest) return;
+  const q = activeQuest;
+  const clientStars = Math.random() < 0.75 ? 5 : 4; // mostly 5s, occasional 4 — feels earned, not perfect
+  workerStats.questsDone += 1;
+  // Rank is the client's call, not just a count of quests: XP earned is
+  // scaled by the star rating the client gives, so a 5★ quest earns full
+  // XP toward your next rank and a lower rating earns proportionally less.
+  const baseXp = 80 + Math.round((q.reward||0)/10);
+  workerStats.xp += Math.round(baseXp * (clientStars/5));
+  workerStats.ratingSum += clientStars;
+  workerStats.ratingCount += 1;
+  const initials = q.client.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  recentReviews.push({
+    name: q.client.name,
+    initials,
+    stars: clientStars,
+    text: REVIEW_LINES[Math.floor(Math.random()*REVIEW_LINES.length)]
+  });
+  // The quest is actually finished now — take it off the board entirely
+  // instead of leaving a dead "Quest Full" card sitting there forever.
+  q.completed = true;
+  renderQuests();
+  renderProfileStats();
+}
+function recordNoShow(){
+  workerStats.noShows += 1;
+  renderProfileStats();
+}
+
+function cancelQuest(){
+  closeSheet('sheet-cancel');
+  toast('₹150 no-show fee applied · quest reissued to next worker');
+  recordNoShow();
+  activeQuest = null;
+  quests.find(q=>q.id===1).slots = 1; // reissue mock
+  renderActive();
+  renderQuests();
+  go('board');
+}
+
+/* ================= RATING ================= */
+function populateRatingSheet(){
+  // The rating that follows evidence submission is always the WORKER
+  // rating the CLIENT they just did the quest for — the payout line
+  // literally says money just moved to the worker, so the worker is
+  // the one still in the loop, rating the person who posted the quest.
+  // Pull both the amount and the name from the real active quest
+  // instead of the old hardcoded "₹600 / Arjun K." placeholder.
+  const amtEl = document.getElementById('rateAmt');
+  const subEl = document.getElementById('rateSubtitle');
+  const clientName = activeQuest?.client?.name || 'the client';
+  if(amtEl) amtEl.textContent = '₹' + (activeQuest?.reward ?? 600);
+  if(subEl) subEl.textContent = `How was working with ${clientName}?`;
+  stars = 0;
+  document.querySelectorAll('#starPicker span').forEach(s=> s.classList.remove('on'));
+  document.querySelectorAll('.sheet-rate .tag, #sheet-rate .tag').forEach(t=> t.classList.remove('sel'));
+}
+function setStars(n){
+  stars = n;
+  document.querySelectorAll('#starPicker span').forEach((s,i)=> s.classList.toggle('on', i<n));
+}
+function submitRating(){
+  closeSheet('sheet-rate');
+  toast('Thanks — rating saved to their Guild Card');
+  recordCompletedQuest();
+  activeQuest = null;
+  renderActive();
+  go('profile');
+}
+
+/* ================= SHEETS / TOAST ================= */
+function openSheet(id){ document.getElementById(id).classList.add('active'); }
+function closeSheet(id){ document.getElementById(id).classList.remove('active'); }
+document.querySelectorAll('.overlay').forEach(o=>{
+  o.addEventListener('click', e=>{ if(e.target===o) o.classList.remove('active'); });
+});
+let toastTimer;
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=> t.classList.remove('show'), 2600);
+}
+
+
+/* ================= SHINE V2 PROTOTYPE UPGRADES ================= */
+const shineSafety = {
+  maxWorkersPerQuest: 9,
+  noShowFee: 150,
+  evidenceRequired: ['Arrival proof','Work proof','Time/location proof']
+};
+
+function showSafetyToast(){
+  toast('🛡️ Shine checks identity, arrival and evidence before releasing payment');
+}
+
+/* Simulate a server-side atomic claim. In production this MUST be a transaction/
+   conditional update with a unique assignment constraint, not browser state. */
+function atomicClaim(q){
+  if(!q || q.slots <= 0) return false;
+  q.slots = q.slots - 1;
+  q.assigned = q.assigned || [];
+  q.assigned.push({id:'demo-'+Date.now(), status:'accepted'});
+  return true;
+}
+
+/* Replace the original accept handler with the safer prototype version. */
+const originalAcceptQuest = acceptQuest;
+acceptQuest = function(id){
+  const q = quests.find(x=>x.id===id);
+  if(!q) return;
+  if(q.slots<=0){
+    toast('⚔️ Quest filled — another Guild member got the last slot');
+    closeSheet('sheet-detail'); renderQuests(); return;
+  }
+  if(!atomicClaim(q)){
+    toast('Quest filled — please choose another');
+    return;
+  }
+  activeQuest = q;
+  closeSheet('sheet-detail');
+  toast('⚔️ Quest secured • reward locked in escrow');
+  renderQuests();
+  renderActive();
+  setTimeout(()=>go('active'),350);
+};
+
+/* Richer evidence workflow. */
+const originalStartWork = startWork;
+startWork = function(){
+  renderTimeline('work');
+  toast('🖐️ Identity + location confirmed — work clock started');
+  document.getElementById('checkinBox').innerHTML =
+    '<div class="status-chip">🟢 On-site identity verified · Location matched</div>';
+  document.getElementById('evidenceBox').innerHTML = `
+    <div class="section-title" style="font-size:15px;margin-top:8px">Proof of Completion</div>
+    <div class="warn-box" style="color:var(--text-dim);border-color:rgba(79,191,149,.22);background:rgba(79,191,149,.06)">
+      <b style="color:var(--sage)">Three proof layers</b><br>
+      1. Before/after photos or short video<br>
+      2. Automatic timestamp + GPS at capture<br>
+      3. Completion note matching the client's instructions
+    </div>
+    <div class="evidence-drop" id="evDrop" onclick="openEvidenceCamera()">📷 Open Camera to Capture Proof</div>
+<img id="evidencePreview" class="capture-preview" style="display:none;margin-bottom:12px">
+    <textarea id="evNote" placeholder="Tell the client exactly what you completed…" style="width:100%;background:var(--ink-raised);border:1px solid var(--ink-line);border-radius:12px;padding:12px;color:var(--text);min-height:76px;margin-bottom:12px;"></textarea>
+    <button class="btn btn-gold" style="width:100%" onclick="submitEvidence()">Submit Proof & Request Payment</button>
+  `;
+};
+
+const originalFillEvidence = fillEvidence;
+fillEvidence = function(){
+  const d=document.getElementById('evDrop');
+  if(!d) return;
+  d.classList.add('filled');
+  d.innerHTML='✅ 4 photos + 1 short video attached<br><small>Timestamped • GPS tagged • Integrity checked</small>';
+};
+
+const originalSubmitEvidence = submitEvidence;
+submitEvidence = function(){
+  const note=(document.getElementById('evNote')||{}).value || '';
+  if(!document.getElementById('evDrop')?.classList.contains('filled')){
+    toast('📸 Add evidence before requesting payment'); return;
+  }
+  renderTimeline('evidence');
+  toast('📨 Proof sent to client • escrow remains locked');
+  setTimeout(()=>{
+    renderTimeline('paid');
+    populateRatingSheet();
+    openSheet('sheet-rate');
+  },1400);
+};
+
+/* Reissue immediately after a no-show/quit in this prototype. */
+cancelQuest = function(){
+  closeSheet('sheet-cancel');
+  if(activeQuest){
+    activeQuest.slots = Math.min(activeQuest.total, activeQuest.slots + 1);
+    activeQuest.assigned = [];
+  }
+  recordNoShow();
+  activeQuest=null;
+  renderActive();
+  renderQuests();
+  toast('🔁 Worker removed • quest instantly reissued nearby');
+  setTimeout(()=>go('board'),450);
+};
+
+/* Post quest with actual prototype object creation. */
+postQuest = function(){
+  const title=document.getElementById('pTitle').value.trim() || 'Small trusted task';
+  const desc=document.getElementById('pDesc').value.trim() || 'Please complete the requested task and submit evidence.';
+  const addr=document.getElementById('pAddr').value.trim() || 'Location to be confirmed';
+  const reward=Math.max(50,Number(document.getElementById('pReward').value)||0);
+  const icons={home:'🏠',tech:'🔧',elder:'👴',child:'🧒',company:'💬',errand:'📦',other:'✨'};
+  const colors={home:'#FBEFD9',tech:'#ECE7FB',elder:'#E1F3EA',child:'#FBE6EF',company:'#FCEAE4',errand:'#FBEFD9',other:'#ECE7FB'};
+  const q={
+    id:Date.now(),cat:selectedCat,icon:icons[selectedCat]||'✨',color:colors[selectedCat]||'#FBEFD9',
+    // The S/A/B badge is now literally the urgency the client picked on this
+    // form (setUrgency()) — not a hardcoded value, and not decided by the
+    // worker or the app.
+    title,desc,addr,tier:selectedUrgency,reward,slots:qty,total:qty,
+    client:{name:'You',rating:4.9,phone:'+91 ••••• •••••',addr:'Verified address'}
+  };
+  quests.unshift(q);
+  toast('🔏 Identity check passed • reward placed in escrow');
+  setTimeout(()=>{
+    renderQuests(); setRole('worker');
+    toast('✨ Quest is live for nearby verified Guild members');
+  },900);
+};
+
+/* Improve navigation affordance while retaining the Google Maps handoff. */
+navigateToQuest = function(){
+  if(!activeQuest){toast('Accept a quest first');return;}
+  const q=encodeURIComponent(activeQuest.addr);
+  window.open('https://www.google.com/maps/search/?api=1&query='+q,'_blank','noopener');
+  toast('🧭 Opening Google Maps for the quest address');
+};
+
+/* Add a visual explanation of dispute resolution. */
+function openDisputeInfo(){
+  openSheet('sheet-detail');
+  document.getElementById('detailBody').innerHTML=`
+    <div class="qicon" style="background:#8a7cf522;width:64px;height:64px;font-size:34px;border-radius:18px">⚖️</div>
+    <h2 style="font-family:'Cinzel',serif;color:var(--gold-soft);font-size:20px;margin:10px 0">Guild Council Review</h2>
+    <p style="color:var(--text-dim);font-size:13px;line-height:1.55">
+      Shine keeps the reward in escrow while a dispute is open. Both sides submit messages,
+      arrival records and task evidence. The Council compares the evidence, can request
+      additional proof, then decides whether to release, refund or split the escrow.
+    </p>
+    <div class="row-info"><span>1 · Identity</span><span>Verified profiles</span></div>
+    <div class="row-info"><span>2 · Arrival</span><span>GPS + on-site check</span></div>
+    <div class="row-info"><span>3 · Work</span><span>Photos / video / notes</span></div>
+    <div class="row-info"><span>4 · Decision</span><span>Release / refund / split</span></div>
+    <button class="btn btn-gold" style="width:100%;margin-top:16px" onclick="closeSheet('sheet-detail')">Understood</button>
+  `;
+}
+
+/* First-run safety hint */
+setTimeout(()=>toast('✨ Welcome to the brighter side of Shine'),1800);
+
+
+/* ===== APP-LIKE QUICK PANELS ===== */
+function showAllQuests(btn){
+  currentFilter='all';
+  document.querySelectorAll('#screen-board .chip').forEach((c,i)=>c.classList.toggle('active',i===0));
+  renderQuests();
+  toast('Showing all nearby quests');
+  const list=document.getElementById('questList');
+  if(list) list.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function openQuickPanel(kind){
+  const body=document.getElementById('quickPanelBody');
+  const data={
+    workers:{title:'Trusted Workers',icon:'👥',rows:[['🛡️','23 verified workers nearby','Available for small tasks'],['⭐','Arjun K. · 4.9','Home watch · ₹600+'],['🔧','Ravi S. · 4.8','Repair supervision · ₹400+']]},
+    messages:{title:'Messages',icon:'✉️',rows:[['💬','Guild Council','No new disputes'],['👤','Meera P.','Quest details updated'],['🛡️','Shine','Your verification is active']]},
+    notifications:{title:'Notifications',icon:'🔔',rows:[['⚡','New nearby quest','A trusted-person task is available'],['💰','Escrow protected','Your accepted quest reward is locked'],['🛡️','Verification active','Face, ID and fingerprint completed']]},
+    rules:{title:'Shine Safety Rules',icon:'🛡️',rows:[['1','Verify identity','Only verified members can accept quests'],['2','Check in','On-site verification starts the work clock'],['3','Submit proof','Photos, notes and location evidence protect both sides'],['4','Escrow','Payment releases only after approval']]}
+  }[kind] || null;
+  if(!data)return;
+  body.innerHTML=`<h3>${data.icon} ${data.title}</h3><div class="quick-list">${data.rows.map(r=>`<div class="quick-row"><div class="qico">${r[0]}</div><div><b>${r[1]}</b><small>${r[2]}</small></div></div>`).join('')}</div>`;
+  openSheet('quickPanel');
+}
+/* Make the entire quest card tappable, while keeping buttons working normally. */
+document.addEventListener('click',function(e){
+  const card=e.target.closest('#questList .qcard');
+  if(card && !e.target.closest('button,input,a,[role="button"]')){
+    const btn=card.querySelector('.viewbtn:not(:disabled)');
+    if(btn) btn.click();
+  }
+});
+
+/* ================= INIT ================= */
+renderQuests();
+renderCatGrid();
+renderActive();
+renderProfileStats();
+initRealMaps();
+go('login');
+
+/* ===== REAL BROWSER CAMERA PROTOTYPE ===== */
+let cameraStream=null;
+let cameraMode='face';
+let cameraTarget='';
+
+async function openCamera(mode){
+  cameraMode=mode;
+  const modal=document.getElementById('cameraModal');
+  const video=document.getElementById('cameraVideo');
+  const title=document.getElementById('cameraTitle');
+  const hint=document.getElementById('cameraHint');
+  const guide=document.getElementById('cameraGuide');
+  const preview=document.getElementById('capturePreview');
+
+  title.textContent=mode==='face'?'Face Capture':'Government ID Capture';
+  hint.textContent=mode==='face'
+    ? 'Center your face inside the guide and capture a clear live photo.'
+    : 'Place the ID inside the rectangle. Avoid glare and capture both sides if required.';
+  guide.style.borderRadius=mode==='face'?'48% 48% 43% 43%':'16px';
+  guide.style.width=mode==='face'?'190px':'330px';
+  guide.style.height=mode==='face'?'245px':'180px';
+  preview.style.display='none';
+  modal.classList.add('active');
+
+  try{
+    cameraStream=await navigator.mediaDevices.getUserMedia({
+      video:{facingMode:'user',width:{ideal:1280},height:{ideal:720}},audio:false
+    });
+    video.srcObject=cameraStream;
+  }catch(err){
+    hint.textContent='Camera permission is blocked. Allow camera access in your browser and try again.';
+    toast('📷 Camera permission required');
+  }
+}
+
+function captureCamera(){
+  const video=document.getElementById('cameraVideo');
+  const preview=document.getElementById('capturePreview');
+  if(!video.videoWidth){
+    toast('Camera is not ready yet'); return;
+  }
+  const canvas=document.createElement('canvas');
+  canvas.width=video.videoWidth; canvas.height=video.videoHeight;
+  const ctx=canvas.getContext('2d');
+  ctx.drawImage(video,0,0);
+  const data=canvas.toDataURL('image/jpeg',.88);
+  preview.src=data; preview.style.display='block';
+
+  if(cameraMode==='face'){
+    document.getElementById('faceRing').classList.add('locked');
+    document.getElementById('faceRing').querySelector('span').textContent='📸';
+    toast('✅ Face photo captured');
+    setTimeout(()=>{closeCamera();go('verify2');},550);
+  }else{
+    fillIdFromCamera(data);
+    setTimeout(closeCamera,500);
+  }
+}
+
+function fillIdFromCamera(data){
+  const box=document.getElementById('idUpload');
+  box.classList.add('filled');
+  box.innerHTML='<b>✅ Government ID captured</b>Photo + document image recorded for verification';
+  idScanned = true;
+  checkVerify2Ready();
+}
+
+function closeCamera(){
+  const modal=document.getElementById('cameraModal');
+  modal.classList.remove('active');
+  const video=document.getElementById('cameraVideo');
+  if(cameraStream){
+    cameraStream.getTracks().forEach(t=>t.stop());
+    cameraStream=null;
+  }
+  video.srcObject=null;
+}
+
+function openFingerprint(target){
+  cameraTarget=target||'register';
+  document.getElementById('fingerModal').classList.add('active');
+}
+
+function captureFingerprint(){
+  const pad=document.getElementById('fingerPad');
+  pad.innerHTML='<div style="font-size:72px">✅</div>';
+  toast('✅ Fingerprint scan captured');
+  setTimeout(()=>{
+    closeFinger();
+    if(cameraTarget==='register') go('verifydone');
+    else startWork();
+  },650);
+}
+
+function closeFinger(){
+  document.getElementById('fingerModal').classList.remove('active');
+}
+
+/* Evidence capture uses the same real camera module. */
+function openEvidenceCamera(){
+  cameraMode='evidence';
+  const modal=document.getElementById('cameraModal');
+  const video=document.getElementById('cameraVideo');
+  const title=document.getElementById('cameraTitle');
+  const hint=document.getElementById('cameraHint');
+  const guide=document.getElementById('cameraGuide');
+  const preview=document.getElementById('capturePreview');
+  title.textContent='Quest Evidence';
+  hint.textContent='Capture the completed work. The real app should attach server timestamp + location metadata.';
+  guide.style.width='82%'; guide.style.height='72%'; guide.style.borderRadius='16px';
+  preview.style.display='none';
+  modal.classList.add('active');
+  navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:1280},height:{ideal:720}},audio:false})
+    .then(s=>{cameraStream=s;video.srcObject=s})
+    .catch(()=>toast('📷 Allow camera access to capture evidence'));
+}
+
+const originalCaptureCamera=captureCamera;
+captureCamera=function(){
+  if(cameraMode!=='evidence'){originalCaptureCamera();return;}
+  const video=document.getElementById('cameraVideo');
+  const preview=document.getElementById('capturePreview');
+  if(!video.videoWidth){toast('Camera is not ready yet');return}
+  const canvas=document.createElement('canvas');
+  canvas.width=video.videoWidth;canvas.height=video.videoHeight;
+  canvas.getContext('2d').drawImage(video,0,0);
+  preview.src=canvas.toDataURL('image/jpeg',.88);
+  preview.style.display='block';
+  const d=document.getElementById('evDrop');
+  if(d){
+    d.classList.add('filled');
+    d.innerHTML='✅ Evidence photo captured<br><small>Ready to submit with timestamp + location proof</small>';
+  }
+  toast('📸 Evidence captured');
+  setTimeout(closeCamera,450);
+};
+
+/* On-site check-in now opens the fingerprint prototype instead of fake scanning. */
+function openOnSiteFingerprint(){
+  openFingerprint('onsite');
+}
+
+
+/* Sidebar active-state highlighting is now handled directly inside go()
+   via each button's data-nav attribute, so no separate override is needed
+   here (the old version highlighted the wrong item for some tabs). */
+
+
+/* ===== ID CAMERA + BIOMETRIC CONTROLLER ===== */
+let identityStream = null;
+let identityMode = 'id';
+let identityContext = null; // 'register' => this scan is part of first-time Guild Card setup
+
+function openIdentityModule(mode='id', context=null){
+  identityMode = mode;
+  identityContext = context;
+  document.getElementById('identityModal').classList.add('active');
+  switchIdentityMode(mode);
+}
+
+function switchIdentityMode(mode){
+  identityMode = mode;
+  document.getElementById('tabId').classList.toggle('active', mode==='id');
+  document.getElementById('tabFinger').classList.toggle('active', mode==='finger');
+  document.getElementById('idCapturePanel').style.display = mode==='id' ? 'block' : 'none';
+  document.getElementById('fingerCapturePanel').style.display = mode==='finger' ? 'block' : 'none';
+  document.getElementById('identitySuccess').style.display='none';
+  document.getElementById('identityTitle').textContent =
+    mode==='id' ? 'Government ID Scan' : 'Fingerprint Verification';
+
+  if(mode==='id') startIDCamera();
+  else stopIdentityCamera();
+}
+
+async function startIDCamera(){
+  const video=document.getElementById('idCameraVideo');
+  const status=document.getElementById('idCameraStatus');
+  stopIdentityCamera();
+
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    status.textContent='Camera is unavailable in this browser. Run SHINE from localhost or HTTPS.';
+    return;
+  }
+
+  try{
+    identityStream=await navigator.mediaDevices.getUserMedia({
+      video:{
+        facingMode:{ideal:'environment'},
+        width:{ideal:1280},
+        height:{ideal:720}
+      },
+      audio:false
+    });
+    video.srcObject=identityStream;
+    status.textContent='Camera ready • align the document • avoid glare';
+  }catch(err){
+    status.textContent='Camera permission denied. Allow camera access and reopen the scanner.';
+    toast('📷 Please allow camera access');
+  }
+}
+
+function captureIdentityID(){
+  const video=document.getElementById('idCameraVideo');
+  const preview=document.getElementById('idPreview');
+  if(!video.videoWidth){
+    toast('📷 Camera is not ready');
+    return;
+  }
+
+  const canvas=document.createElement('canvas');
+  canvas.width=video.videoWidth;
+  canvas.height=video.videoHeight;
+  canvas.getContext('2d').drawImage(video,0,0);
+
+  preview.src=canvas.toDataURL('image/jpeg',.9);
+  preview.style.display='block';
+
+  const box=document.getElementById('idUpload');
+  if(box){
+    box.classList.add('filled');
+    box.innerHTML='<b>✅ Government ID captured</b>Document image ready for secure verification';
+  }
+  idScanned = true;
+  checkVerify2Ready();
+
+  stopIdentityCamera();
+  showIdentitySuccess('Government ID image captured. Ready for secure KYC verification.');
+}
+
+function startBiometricVerification(){
+  const box=document.getElementById('fingerprintBox');
+  box.innerHTML='<div style="font-size:70px">☝️</div><div class="fingerprint-scanline"></div>';
+
+  // Disable both buttons the instant scanning starts — without this, an
+  // impatient re-tap during the ~2s scan stacks a second identical flow on
+  // top of the first (double toasts, a second scan animation racing the
+  // first), which is what actually reads as "an error" even though nothing
+  // technically crashes.
+  document.querySelectorAll('#fingerCapturePanel .identity-actions button').forEach(b=> b.disabled = true);
+
+  toast('🔎 Reading biometric...');
+  setTimeout(()=>{
+    showIdentitySuccess('Biometric verification completed. Production SHINE should confirm this through the device secure biometric system.');
+    const ring=document.getElementById('printRing');
+    if(ring){
+      ring.classList.add('locked');
+      const span=ring.querySelector('span');
+      if(span) span.textContent='✓';
+    }
+    // If this scan was part of first-time registration, carry the user on to their new Guild Card.
+    if(identityContext==='register'){
+      markVerified();
+      updateIdentityDisplays();
+      setTimeout(()=> go('verifydone'), 1200);
+    }
+    // If this was a returning member confirming it's them at sign-in, let them straight in.
+    if(identityContext==='login'){
+      markVerified();
+      if(!userName) setUserName('Guild Member');
+      setTimeout(()=>{ toast('Welcome back, ' + userName); go('board'); }, 1200);
+    }
+    document.querySelectorAll('#fingerCapturePanel .identity-actions button').forEach(b=> b.disabled = false);
+  },1500);
+}
+
+function showIdentitySuccess(text){
+  document.getElementById('idCapturePanel').style.display='none';
+  document.getElementById('fingerCapturePanel').style.display='none';
+  document.getElementById('identitySuccess').style.display='block';
+  document.getElementById('identitySuccessText').textContent=text;
+  setTimeout(()=>{
+    closeIdentityModule();
+  },1800);
+}
+
+function closeIdentityModule(){
+  stopIdentityCamera();
+  document.getElementById('identityModal').classList.remove('active');
+}
+
+function stopIdentityCamera(){
+  if(identityStream){
+    identityStream.getTracks().forEach(t=>t.stop());
+    identityStream=null;
+  }
+  const video=document.getElementById('idCameraVideo');
+  if(video) video.srcObject=null;
+}
+
+/* Connect the ID-upload placeholder to the real ID camera module.
+   NOTE: fingerprint buttons are intentionally NOT auto-rebound here anymore —
+   each one already has its own explicit onclick (openIdentityModule('finger'),
+   runScan(...), captureFingerprint(), or startBiometricVerification()).
+   A previous blanket text-matching rebind here was overwriting those specific
+   handlers (including the modal's own "Scan Fingerprint" capture button),
+   which is why tapping Scan Fingerprint appeared to do nothing. */
+document.addEventListener('DOMContentLoaded',()=>{
+  const idUpload=document.getElementById('idUpload');
+  if(idUpload){
+    idUpload.onclick=()=>openIdentityModule('id');
+  }
+});
+
+
+
+/* ===== V8 INTERACTION REPAIR ===== */
+(function(){
+  const originalOpenCamera = window.openCamera;
+  const originalCaptureCamera = window.captureCamera;
+  const originalCloseCamera = window.closeCamera;
+
+  function setCameraFallback(mode, message){
+    const frame=document.getElementById('cameraFrame');
+    if(!frame) return;
+    let box=document.getElementById('cameraFallback');
+    if(!box){
+      box=document.createElement('div');
+      box.id='cameraFallback';
+      box.className='camera-fallback';
+      frame.appendChild(box);
+    }
+    box.innerHTML='<b>Camera unavailable in this page mode.</b><br>'+message;
+  }
+
+  function imageFileToPreview(file, preview, done){
+    if(!file) return;
+    if(!file.type.startsWith('image/')){ toast('Please choose an image'); return; }
+    const reader=new FileReader();
+    reader.onload=()=>{ preview.src=reader.result; preview.style.display='block'; done(reader.result); };
+    reader.readAsDataURL(file);
+  }
+
+  window.openCamera = async function(mode){
+    cameraMode=mode;
+    const modal=document.getElementById('cameraModal');
+    const video=document.getElementById('cameraVideo');
+    const title=document.getElementById('cameraTitle');
+    const hint=document.getElementById('cameraHint');
+    const guide=document.getElementById('cameraGuide');
+    const preview=document.getElementById('capturePreview');
+    if(!modal||!video) return;
+    title.textContent=mode==='face'?'Face Capture':mode==='evidence'?'Quest Evidence':'Government ID Capture';
+    hint.textContent=mode==='face'
+      ? 'Center your face inside the guide and capture a clear photo.'
+      : mode==='evidence'
+      ? 'Capture proof of the completed work.'
+      : 'Place the ID inside the rectangle and capture it clearly.';
+    guide.style.borderRadius=mode==='face'?'48% 48% 43% 43%':'16px';
+    guide.style.width=mode==='face'?'190px':'82%';
+    guide.style.height=mode==='face'?'245px':'72%';
+    preview.style.display='none';
+    const old=document.getElementById('cameraFallback'); if(old) old.remove();
+    modal.classList.add('active');
+    try{
+      if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) throw new Error('unsupported');
+      cameraStream=await navigator.mediaDevices.getUserMedia({
+        video:{facingMode:mode==='evidence'?'environment':'user',width:{ideal:1280},height:{ideal:720}},audio:false
+      });
+      video.srcObject=cameraStream;
+      hint.textContent='Camera ready • align the subject and press Capture.';
+    }catch(err){
+      setCameraFallback(mode,
+        location.protocol==='file:'
+        ? 'This HTML file was opened directly. Use the fallback below, or run it from localhost/HTTPS for live camera access.'
+        : 'Allow camera access in your browser, or use the fallback below.'
+      );
+      toast('📷 Live camera unavailable — fallback enabled');
+      document.getElementById('captureBtn').textContent='📁 Choose Photo';
+    }
+  };
+
+  window.captureCamera = function(){
+    const video=document.getElementById('cameraVideo');
+    const preview=document.getElementById('capturePreview');
+    if(video && video.videoWidth){
+      return originalCaptureCamera();
+    }
+    const input=document.getElementById(cameraMode==='face'?'faceFallbackInput':cameraMode==='evidence'?'evidenceFallbackInput':'idFallbackInput');
+    if(!input){toast('Camera is not ready');return;}
+    input.value=''; input.click();
+  };
+
+  document.getElementById('faceFallbackInput').addEventListener('change',function(){
+    const file=this.files&&this.files[0]; if(!file)return;
+    imageFileToPreview(file,document.getElementById('capturePreview'),function(){
+      document.getElementById('faceRing').classList.add('locked');
+      document.getElementById('faceRing').querySelector('span').textContent='📸';
+      toast('✅ Face photo captured');
+      setTimeout(()=>{originalCloseCamera();go('verify2');},450);
+    });
+  });
+
+  document.getElementById('idFallbackInput').addEventListener('change',function(){
+    const file=this.files&&this.files[0]; if(!file)return;
+    imageFileToPreview(file,document.getElementById('capturePreview'),function(data){
+      fillIdFromCamera(data); toast('✅ Government ID captured');
+      setTimeout(originalCloseCamera,450);
+    });
+  });
+
+  document.getElementById('evidenceFallbackInput').addEventListener('change',function(){
+    const files=[...(this.files||[])]; if(!files.length)return;
+    const first=files[0];
+    if(first.type.startsWith('image/')){
+      const reader=new FileReader();
+      reader.onload=()=>{
+        const preview=document.getElementById('capturePreview');
+        preview.src=reader.result;preview.style.display='block';
+        const d=document.getElementById('evDrop');
+        if(d){d.classList.add('filled');d.innerHTML='✅ Evidence captured<br><small>'+files.length+' file(s) ready • timestamp/location metadata simulated</small>';}
+        toast('📸 Evidence captured'); setTimeout(originalCloseCamera,450);
+      }; reader.readAsDataURL(first);
+    }else{
+      const d=document.getElementById('evDrop');
+      if(d){d.classList.add('filled');d.innerHTML='✅ Evidence file selected<br><small>Ready to submit • metadata simulated</small>';}
+      toast('🎥 Evidence file selected'); setTimeout(originalCloseCamera,450);
+    }
+  });
+
+  /* Make every previously cosmetic desktop option lead somewhere useful. */
+  window.openWorkersDirectory=function(){
+    openSheet('sheet-detail');
+    document.getElementById('detailBody').innerHTML=`
+      <div class="qicon" style="background:#eeeaff;width:64px;height:64px;font-size:34px;border-radius:18px">👥</div>
+      <h2 style="font-family:'Cinzel',serif;color:#765000;font-size:20px;margin:10px 0">Verified Workers</h2>
+      <p style="color:var(--text-dim);font-size:13px;line-height:1.5">Trusted Guild members available nearby.</p>
+      <div class="repair-list">
+        <div class="repair-item"><span>👤</span><div><b>Arjun R.</b><br><small>4.9 ★ · 37 quests · Verified</small></div></div>
+        <div class="repair-item"><span>👤</span><div><b>Priya M.</b><br><small>4.8 ★ · 24 quests · Verified</small></div></div>
+        <div class="repair-item"><span>👤</span><div><b>Karthik S.</b><br><small>4.7 ★ · 19 quests · Verified</small></div></div>
+      </div>
+      <button class="btn btn-gold" style="width:100%" onclick="closeSheet('sheet-detail')">Done</button>`;
+  };
+  window.openMessages=function(){
+    openSheet('sheet-detail');
+    document.getElementById('detailBody').innerHTML=`
+      <div class="qicon" style="background:#f0edff;width:64px;height:64px;font-size:34px;border-radius:18px">💬</div>
+      <h2 style="font-family:'Cinzel',serif;color:#765000;font-size:20px;margin:10px 0">Guild Messages</h2>
+      <div class="repair-list"><div class="repair-item"><span>🛡️</span><div><b>Guild Council</b><br><small>Your evidence review is in progress.</small></div></div><div class="repair-item"><span>👤</span><div><b>Meera P.</b><br><small>Thanks for the update on the quest.</small></div></div></div>
+      <button class="btn btn-gold" style="width:100%" onclick="go('support');closeSheet('sheet-detail')">Open Support</button>`;
+  };
+  window.openRules=function(){
+    openSheet('sheet-detail');
+    document.getElementById('detailBody').innerHTML=`
+      <div class="qicon" style="background:#fff8df;width:64px;height:64px;font-size:34px;border-radius:18px">🛡️</div>
+      <h2 style="font-family:'Cinzel',serif;color:#765000;font-size:20px;margin:10px 0">Shine Safety Rules</h2>
+      <div class="repair-list"><div class="repair-item"><span>1</span><div><b>Verify identity</b><br><small>Face, ID and biometric checks are simulated in this prototype.</small></div></div><div class="repair-item"><span>2</span><div><b>Protect private data</b><br><small>Never share OTPs, passwords or sensitive documents in chat.</small></div></div><div class="repair-item"><span>3</span><div><b>Submit evidence</b><br><small>Capture arrival and completion proof for every quest.</small></div></div></div>
+      <button class="btn btn-gold" style="width:100%" onclick="closeSheet('sheet-detail')">Understood</button>`;
+  };
+
+  /* NOTE: Workers/Messages/Rules and the notification/message top icons already
+     have their real handlers wired inline in the HTML (openQuickPanel(...)).
+     A previous pass here re-grabbed those same buttons by their text content
+     and silently overwrote those handlers with an older, inconsistent sheet
+     UI — the exact class of bug that broke the fingerprint button earlier.
+     Removed so there's one single source of truth per button again. */
+
+  /* View All already calls showAllQuests(this) inline — no need to rebind it here too. */
+
+  /* Make quest category buttons keyboard-friendly. */
+  document.querySelectorAll('.chip,.icon-pick,.tag,.navbtn,.side-item,.top-icon').forEach(el=>{
+    if(!el.getAttribute('aria-label')) el.setAttribute('aria-label',(el.textContent||'').trim().replace(/\s+/g,' '));
+  });
+
+  /* Stop any camera when leaving its modal with Escape. */
+  document.addEventListener('keydown',e=>{
+    if(e.key==='Escape'){
+      closeSheet('sheet-detail');closeSheet('sheet-checkin');closeSheet('sheet-cancel');closeSheet('sheet-rate');
+      closeCamera();closeIdentityModule();closeFinger();
+    }
+  });
+})();
+
+</script>
+</body>
+</html>
